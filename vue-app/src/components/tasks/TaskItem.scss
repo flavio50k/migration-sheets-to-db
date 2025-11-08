@@ -1,0 +1,57 @@
+/* vue-app/src/components/task/TaskItem.scss */
+.task-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid #ccc;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  background: #f9f9f9;
+}
+.task-content {
+  display: flex;
+  align-items: center;
+  flex-grow: 1; /* Ocupa o espaço restante */
+}
+.task-title-text {
+  cursor: pointer; /* Indica que é clicável */
+  flex-grow: 1;
+  margin-left: 10px;
+}
+.completed {
+  text-decoration: line-through;
+  color: #888;
+}
+.admin-tag {
+  margin-left: 10px;
+  padding: 2px 5px;
+  background: #4a90e2;
+  color: white;
+  border-radius: 3px;
+  font-size: 0.7em;
+  font-weight: bold;
+}
+.edit-input {
+  flex-grow: 1;
+  margin-left: 10px;
+  padding: 5px;
+  border: 1px solid #007bff;
+  border-radius: 3px;
+}
+
+.task-actions button {
+  margin-left: 8px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.save-btn {
+  background-color: #28a745;
+  color: white;
+}
+.delete-btn {
+  background-color: #dc3545;
+  color: white;
+}

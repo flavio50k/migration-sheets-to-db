@@ -21,202 +21,50 @@
         <button @click="logout">Sair</button>
       </div>
 
+      <MigrationUpload :token="token" @migration-complete="loadTasks" />
+      <hr>
+
+      <h3>Gestão de Projetos (Tasks)</h3>
       <button @click="loadTasks">Carregar/Atualizar Tarefas</button>
 
-      <ul class="task-list">
-        <TaskItem
-          v-for="task in tasks"
-          :key="task.id"
-          :task="task"
-          :userRole="userRole"
-          @delete-task="deleteTask"
-          @toggle-complete="toggleTaskCompleted"
-          @update-task="updateTask"
-        />
-      </ul>
-      <p v-if="!tasks.length">Nenhuma tarefa encontrada ou falha ao carregar.</p>
-
-      <div class="task-create">
-        <h3>Nova Tarefa</h3>
-        <input type="text" v-model="newTaskTitle" placeholder="Nova tarefa..." required />
-        <button @click="createTask" :disabled="!newTaskTitle.length">Criar</button>
+      <div class="new-task-area">
+        <input type="text" v-model="newTaskTitle" placeholder="Título do novo projeto/tarefa"
+          @keyup.enter="createTask" />
+        <button @click="createTask" :disabled="!newTaskTitle.trim()">
+          Adicionar Projeto
+        </button>
       </div>
+
+      <p v-if="errorMessage" class="error-msg">{{ errorMessage }}</p>
+
+      <ul class="task-list">
+        <TaskItem v-for="task in tasks" :key="task.id" :task="task" :userRole="userRole" @delete-task="deleteTask"
+          @toggle-complete="toggleTaskCompleted" @update-task="updateTask" />
+      </ul>
     </div>
   </div>
 </template>
 
 <script>
-import axios from "axios";
-import TaskItem from "./components/TaskItem.vue";
+import AppLogic from './App.js'; // Importa o objeto de lógica/script
 
-const API_URL = process.env.VUE_APP_API_URL || "http://localhost:3000/api";
+// 🐛 CORRIGIDO: Atualiza o caminho para a nova estrutura de pastas
+import TaskItem from "./components/task/TaskItem.vue";
+import MigrationUpload from "./components/migration/MigrationUpload.vue";
 
 export default {
   name: "App",
+  // 1. O componente Vue precisa declarar quais filhos ele usará
   components: {
     TaskItem,
+    MigrationUpload,
   },
-  data() {
-    return {
-      apiUrl: API_URL,
-      token: localStorage.getItem("token") || null,
-      userRole: localStorage.getItem("role") || "user",
-      tasks: [],
-      username: "",
-      password: "",
-      newTaskTitle: "",
-      authMessage: "",
-      authSuccess: false,
-    };
-  },
-  mounted() {
-    if (this.token) {
-      this.loadTasks();
-    }
-  },
-  methods: {
-    // ... (handleAuth e handleApiCall são mantidos) ...
-    async handleAuth(endpoint) {
-      this.authMessage = "";
-      const data = { username: this.username, password: this.password };
-      try {
-        const response = await axios.post(`${API_URL}/users/${endpoint}`, data);
-
-        this.token = response.data.token;
-        this.userRole = response.data.role;
-
-        localStorage.setItem("token", this.token);
-        localStorage.setItem("role", this.userRole);
-
-        this.authMessage = `Sucesso! Bem-vindo, ${this.username}. Role: ${this.userRole}`;
-        this.authSuccess = true;
-        this.password = "";
-        this.loadTasks();
-      } catch (error) {
-        this.authSuccess = false;
-        this.authMessage = error.response?.data?.error?.message || `Erro ao ${endpoint}.`;
-      }
-    },
-
-    async handleApiCall(endpoint, error) {
-      console.error(`Erro ao ${endpoint}:`, error);
-      if (error.response?.status === 401 || error.response?.status === 403) {
-        alert("Sua sessão expirou ou o token é inválido. Faça login novamente.");
-        this.logout();
-      }
-      return (
-        error.response?.data?.error?.message ||
-        `Erro ao ${endpoint}: Falha de comunicação.`
-      );
-    },
-
-    // --- CRUD ---
-    async loadTasks() {
-      if (!this.token) return;
-
-      try {
-        const response = await axios.get(`${API_URL}/tasks`, {
-          headers: { Authorization: `Bearer ${this.token}` },
-        });
-        this.tasks = response.data;
-      } catch (error) {
-        this.handleApiCall("carregar tarefas", error);
-        this.tasks = [];
-      }
-    },
-
-    async createTask() {
-      if (!this.newTaskTitle.trim()) return;
-      try {
-        await axios.post(
-          `${API_URL}/tasks`,
-          { title: this.newTaskTitle },
-          { headers: { Authorization: `Bearer ${this.token}` } }
-        );
-        this.newTaskTitle = "";
-        this.loadTasks();
-      } catch (error) {
-        this.handleApiCall("criar tarefa", error);
-      }
-    },
-
-    // MÉTODO EXISTENTE (Toggle completed) - Simples PUT
-    async toggleTaskCompleted(taskId, completedStatus) {
-      this.updateTask(taskId, { completed: completedStatus });
-    },
-
-    // NOVO MÉTODO: Edição do Título (PUT geral)
-    async updateTask(taskId, data) {
-      try {
-        await axios.put(
-          `${API_URL}/tasks/${taskId}`,
-          data, // Pode ser { title: 'novo título' } ou { completed: true/false }
-          { headers: { Authorization: `Bearer ${this.token}` } }
-        );
-        this.loadTasks(); // Recarrega a lista para mostrar a mudança
-      } catch (error) {
-        this.handleApiCall("atualizar tarefa", error);
-      }
-    },
-
-    async deleteTask(taskId) {
-      if (!confirm("Tem certeza que deseja excluir esta tarefa?")) return;
-
-      try {
-        await axios.delete(`${API_URL}/tasks/${taskId}`, {
-          headers: { Authorization: `Bearer ${this.token}` },
-        });
-        this.loadTasks();
-      } catch (error) {
-        if (error.response?.status === 403) {
-          alert("Ação proibida: Você não tem permissão para excluir esta tarefa.");
-        } else {
-          this.handleApiCall("excluir tarefa", error);
-        }
-        this.loadTasks();
-      }
-    },
-
-    logout() {
-      localStorage.clear();
-      this.token = null;
-      this.userRole = "user";
-      this.tasks = [];
-      this.authMessage = "Você saiu do sistema.";
-      this.authSuccess = true;
-    },
-  },
+  // 2. Espalha todas as propriedades de data, methods, e mounted do App.js
+  ...AppLogic,
 };
 </script>
 
-<style>
-/* CSS básico para organizar visualmente (mantido do original) */
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-}
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.auth-section,
-.app-section {
-  padding: 10px;
-  margin-top: 20px;
-}
-.task-list {
-  list-style: none;
-  padding: 0;
-  margin-top: 20px;
-}
-.task-create {
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid #eee;
-}
+<style lang="scss">
+/* Importa o arquivo de estilos SCSS para uso global no componente */
+@import "./App.scss";
 </style>
