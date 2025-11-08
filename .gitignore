@@ -45,3 +45,9 @@ data/mysql/
 
 .DS_Store  # Arquivos do macOS
 Thumbs.db  # Arquivos do Windows
+
+# ------------------------------------
+# 5. ARQUIVOS DE UPLOAD DE DADOS
+# NÃO versionar arquivos grandes de planilhas!
+# ------------------------------------
+backend/uploads/

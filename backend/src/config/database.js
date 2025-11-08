@@ -1,25 +1,44 @@
-// ./backend/src/config/database.js
+// ./backend/src/config/database.js (CORRIGIDO E ATUALIZADO)
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcryptjs');
+const env = require('./env'); 
 
-// ... (dbConfig permanece igual) ...
-const dbConfig = {
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
+// --- 1. CONFIGURAÇÕES DAS POOLS ---
+
+// Pool Interno (projeto_db): Para as operações normais do backend (users, projects)
+const internalDbConfig = {
+    host: env.DB_HOST,
+    user: env.DB_USER,
+    password: env.DB_PASSWORD,
+    database: env.DB_NAME,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
 };
-const pool = mysql.createPool(dbConfig);
+const internalPool = mysql.createPool(internalDbConfig);
+
+// Pool Externo (consultorio_teste): Para a leitura dos dados de migração
+const externalDbConfig = {
+    host: env.EXTERNAL_DB_HOST,
+    user: env.EXTERNAL_DB_USER,
+    password: env.EXTERNAL_DB_PASSWORD,
+    database: env.EXTERNAL_DB_NAME,
+    waitForConnections: true,
+    connectionLimit: 5, // Uma pool menor, pois o uso é intermitente
+    queueLimit: 0
+};
+const externalPool = mysql.createPool(externalDbConfig);
+
 const saltRounds = 10; 
+// O usuário admin padrão é definido aqui
+const adminUsername = 'admin'; 
+const adminPassword = 'admin'; // Senha de desenvolvimento
 
-// --- FUNÇÕES DE CRIAÇÃO/VERIFICAÇÃO DE TABELAS ---
+// --- 2. FUNÇÕES DE CRIAÇÃO/VERIFICAÇÃO DE TABELAS ---
 
-async function ensureTablesExist() {
-    try {
-        // 1. Tabela de Usuários (com a coluna 'role')
+async function ensureTablesExist(pool) {
+    // 1. Tabela de Usuários (somente no DB principal: internalPool)
+    if (pool === internalPool) {
         const createUsersTableQuery = `
             CREATE TABLE IF NOT EXISTS users (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -32,101 +51,103 @@ async function ensureTablesExist() {
         await pool.execute(createUsersTableQuery);
         console.log("Tabela 'users' verificada/criada.");
 
-        // 1.1. MIGRATION: Adiciona a coluna 'role' se a tabela já existia sem ela
-        try {
-            // Este comando tentará adicionar a coluna 'role'. Se ela já existir, o MySQL
-            // pode gerar um erro, mas ele será capturado e ignorado no bloco catch.
-            await pool.execute(
-                "ALTER TABLE users ADD COLUMN role ENUM('user', 'admin') DEFAULT 'user' AFTER password"
-            );
-            console.log("Coluna 'role' adicionada/verificada na tabela 'users'.");
-        } catch (alterError) {
-            // Error code 1060: Duplicate column name 'role'
-            if (alterError.code !== 'ER_DUP_FIELDNAME') {
-                // Ignora o erro se a coluna já existia. Se for outro erro, exibe.
-                console.warn("Aviso na MIGRATION users/role (IGNORADO se for 'ER_DUP_FIELDNAME'):", alterError.message);
-            }
-        }
-        
-        // 2. Tabela de Tarefas
+        // 2. Tabela de Projetos (Antigas Tasks)
         const createTasksTableQuery = `
             CREATE TABLE IF NOT EXISTS tasks (
                 id INT AUTO_INCREMENT PRIMARY KEY,
-                title VARCHAR(255) NOT NULL,
-                completed BOOLEAN DEFAULT 0,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 user_id INT NOT NULL,
+                title VARCHAR(255) NOT NULL,
+                completed BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
             )
         `;
         await pool.execute(createTasksTableQuery);
-        console.log("Tabela 'tasks' verificada/criada.");
+        console.log("Tabela 'tasks' (Projetos) verificada/criada.");
 
-        // 3. Garante que haja um usuário ADMIN padrão (útil para o primeiro uso)
-        await ensureDefaultAdminUser();
-
-    } catch (error) {
-        console.error("ERRO CRÍTICO ao verificar ou criar tabelas:", error);
+        // 💥 NOVO: 3. Tabela de Migrações
+        const createMigrationsTableQuery = `
+            CREATE TABLE IF NOT EXISTS migrations (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                file_name VARCHAR(255) NOT NULL,
+                uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                status ENUM('PENDING', 'PROCESSED', 'FAILED') DEFAULT 'PENDING',
+                user_id INT,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+            )
+        `;
+        await pool.execute(createMigrationsTableQuery);
+        console.log("Tabela 'migrations' verificada/criada.");
+        
+        // 4. Cria o usuário Admin padrão
+        await createDefaultAdmin(internalPool);
     }
 }
 
-
-// --- NOVO: FUNÇÃO PARA CRIAR ADMIN PADRÃO (se não existir) ---
-
-async function ensureDefaultAdminUser() {
-    const adminUsername = 'admin';
-    const adminPassword = 'adminpassword'; // Mude esta senha!
-
+async function createDefaultAdmin(pool) {
     try {
-        // Verifica se o usuário admin já existe
-        const [users] = await pool.execute("SELECT id FROM users WHERE username = ? AND role = 'admin'", [adminUsername]);
-        
+        const [users] = await pool.execute('SELECT id FROM users WHERE username = ?', [adminUsername]);
         if (users.length === 0) {
-            // Se não existe, cria
             const hashedPassword = await bcrypt.hash(adminPassword, saltRounds);
-
             await pool.execute(
                 'INSERT INTO users (username, password, role) VALUES (?, ?, ?)',
                 [adminUsername, hashedPassword, 'admin']
             );
-            console.log(`Usuário Admin padrão (${adminUsername}) criado com sucesso! Senha: ${adminPassword}`);
-        } else {
-            //console.log(`Usuário Admin padrão (${adminUsername}) já existe.`);
+            console.log(`Usuário Admin padrão (${adminUsername}) criado com sucesso.`);
         }
     } catch (error) {
-        // Ignora erros (ex: tabela users ainda está sendo criada, ou erro de hash)
-        console.error("Aviso: Falha ao tentar criar usuário Admin padrão:", error.message);
+        console.error("Aviso: Falha ao tentar criar usuário Admin padrão. Se for a primeira inicialização, ignore:", error.message);
     }
 }
 
+// --- 3. FUNÇÃO DE INICIALIZAÇÃO (Retry com Múltiplas Pools) ---
 
-// --- FUNÇÃO DE INICIALIZAÇÃO (Retry) ---
+async function checkConnection(poolName, pool) {
+    // Tenta executar uma query simples para verificar a conexão
+    await pool.execute('SELECT 1 + 1');
+    console.log(`✅ Conexão com ${poolName} verificada com sucesso.`);
+}
+
 
 async function initializeDatabase() {
     const MAX_RETRIES = 10;
-    const RETRY_DELAY_MS = 3000; // 3 segundos
+    const RETRY_DELAY_MS = 3000; 
     console.log('Iniciando conexão com o MySQL...');
 
     for (let i = 0; i < MAX_RETRIES; i++) {
         try {
-            // 1. Testa a conexão
-            const [rows] = await pool.execute('SELECT 1 + 1 AS solution');
-            console.log('Conexão com MySQL verificada. Tentativa:', i + 1);
+            // 1. Testa a conexão da Pool Interna (projeto_db)
+            await checkConnection('DB Principal (projeto_db)', internalPool);
             
-            // 2. Cria/Verifica tabelas e roles
-            await ensureTablesExist();
+            // 2. Cria/Verifica tabelas (APENAS no DB Principal)
+            await ensureTablesExist(internalPool);
+            
+            // 3. Testa a conexão da Pool Externa (consultorio_teste)
+            // Esta conexão não cria tabelas, apenas verifica se o DB de origem existe.
+            if (env.EXTERNAL_DB_NAME) { // Só tenta se a variável estiver definida
+                await checkConnection(`DB Externo (${env.EXTERNAL_DB_NAME})`, externalPool);
+            }
+
             return; // Sucesso: Sai do loop
         } catch (err) {
-            console.error(`Falha na conexão ou inicialização (Tentativa ${i + 1}/${MAX_RETRIES}):`, err.message);
+            console.error(`Falha na conexão ou inicialização (Tentativa ${i + 1}/${MAX_RETRIES}):`);
+            // Se o erro for de conexão, tentamos novamente
             if (i === MAX_RETRIES - 1) {
                 console.error("Falha na inicialização do DB após várias tentativas. Encerrando.");
-                // Em um ambiente de produção, aqui você encerraria o processo.
-                // process.exit(1);
+                // O erro original
+                throw new Error("Erro Crítico: Não foi possível conectar a um dos bancos de dados.");
             }
             await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
         }
     }
 }
 
+// Chamada de inicialização
 initializeDatabase();
-module.exports = pool;
+
+// --- 4. EXPORTAÇÕES ---
+module.exports = {
+    // Exportamos ambas as pools
+    internalPool, // Pool para 'users' e 'tasks' (seu projeto)
+    externalPool  // Pool para 'consultorio_teste' (sua fonte de dados)
+};
