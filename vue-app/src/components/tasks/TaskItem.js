@@ -1,4 +1,4 @@
-/* vue-app/src/components/task/TaskItem.js */
+/* vue-app/src/components/task/TaskItem.js  */
 export default {
   name: "TaskItem",
   props: {

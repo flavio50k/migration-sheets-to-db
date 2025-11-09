@@ -6,7 +6,7 @@ const API_URL = "/api";
 export default {
   name: 'MigrationUpload',
   props: {
-    /* Propriedade herdada do App.vue para autenticação */
+    /* Propriedade herdada do App.vue para autenticação  */
     token: {
       type: String,
       required: true

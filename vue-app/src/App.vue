@@ -59,7 +59,7 @@ export default {
     TaskItem,
     MigrationUpload,
   },
-  // 2. Espalha todas as propriedades de data, methods, e mounted do App.js
+  // 2. Espalha todas as propriedades de data, methods, e mounted do App.js 
   ...AppLogic,
 };
 </script>

@@ -1,4 +1,4 @@
-/* vue-app/src/App.js */
+/* vue-app/src/App.js  */
 import axios from "axios";
 // O API_URL é o prefixo de proxy definido no Nginx.
 const API_URL = "/api"; 
