@@ -3,7 +3,7 @@
 const userModel = require('../models/UserModel');
 const bcrypt = require('bcryptjs'); 
 const jwt = require('jsonwebtoken'); 
-const env = require('../config/env'); // IMPORTAÇÃO
+const env = require('../config/env');
 
 const saltRounds = 10;
 
@@ -48,8 +48,6 @@ const register = async (req, res) => {
 
 // --- LOGIN ---
 const login = async (req, res) => {
-    // ... (A função login permanece a mesma) ...
-    // Seu código anterior:
     const { username, password } = req.body;
     if (!username || !password) {
         return res.status(400).json({ error: { message: 'Username e senha são obrigatórios.' } });

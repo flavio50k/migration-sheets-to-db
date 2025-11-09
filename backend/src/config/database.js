@@ -1,4 +1,4 @@
-// ./backend/src/config/database.js (CORRIGIDO E ATUALIZADO)
+// ./backend/src/config/database.js
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcryptjs');
 const env = require('./env'); 
@@ -37,7 +37,7 @@ const adminPassword = 'admin'; // Senha de desenvolvimento
 // --- 2. FUNÇÕES DE CRIAÇÃO/VERIFICAÇÃO DE TABELAS ---
 
 async function ensureTablesExist(pool) {
-    // 1. Tabela de Usuários (somente no DB principal: internalPool)
+    // 1. Tabela de Usuários
     if (pool === internalPool) {
         const createUsersTableQuery = `
             CREATE TABLE IF NOT EXISTS users (
@@ -51,7 +51,7 @@ async function ensureTablesExist(pool) {
         await pool.execute(createUsersTableQuery);
         console.log("Tabela 'users' verificada/criada.");
 
-        // 2. Tabela de Projetos (Antigas Tasks)
+        // 2. Tabela tasks
         const createTasksTableQuery = `
             CREATE TABLE IF NOT EXISTS tasks (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -63,9 +63,9 @@ async function ensureTablesExist(pool) {
             )
         `;
         await pool.execute(createTasksTableQuery);
-        console.log("Tabela 'tasks' (Projetos) verificada/criada.");
+        console.log("Tabela 'tasks' verificada/criada.");
 
-        // 💥 NOVO: 3. Tabela de Migrações
+        // 3. Tabela de Migrações
         const createMigrationsTableQuery = `
             CREATE TABLE IF NOT EXISTS migrations (
                 id INT AUTO_INCREMENT PRIMARY KEY,

@@ -3,9 +3,6 @@ import axios from "axios";
 // O API_URL é o prefixo de proxy definido no Nginx.
 const API_URL = "/api"; 
 
-// Este arquivo exporta apenas o objeto de lógica (data, methods, etc.)
-// As importações de componentes (TaskItem, MigrationUpload) foram movidas para App.vue.
-
 export default {
   // A propriedade 'components' foi removida e movida para App.vue.
   data() {
@@ -17,7 +14,7 @@ export default {
       password: "",
       authMessage: null,
       authSuccess: false,
-      tasks: [],
+      task: [],
       newTaskTitle: "",
       errorMessage: null,
     };
@@ -25,7 +22,7 @@ export default {
   
   mounted() {
     if (this.token) {
-      this.loadTasks();
+      this.loadTask();
     }
   },
 
@@ -43,7 +40,7 @@ export default {
           this.authMessage = this.errorMessage;
           this.authSuccess = false;
       }
-      this.loadTasks(); 
+      this.loadTask(); 
     },
 
     async handleAuth(type) {
@@ -75,7 +72,7 @@ export default {
         this.authSuccess = true;
         this.authMessage = message || `Sucesso! Bem-vindo(a) ${this.username}.`;
         this.password = "";
-        this.loadTasks();
+        this.loadTask();
 
       } catch (error) {
         this.authSuccess = false;
@@ -85,14 +82,13 @@ export default {
       }
     },
 
-    async loadTasks() {
+    async loadTask() {
       this.errorMessage = "";
       try {
-        // CORREÇÃO MANTIDA: Rota deve ser /tasks (para resolver o erro inicial de Login/Registro/CRUD)
-        const response = await axios.get(`${API_URL}/tasks`, {
+          const response = await axios.get(`${API_URL}/task`, {
           headers: { Authorization: `Bearer ${this.token}` },
         });
-        this.tasks = response.data;
+        this.task = response.data;
       } catch (error) {
         this.handleApiCall("carregar tarefas", error);
       }
@@ -102,12 +98,12 @@ export default {
       if (!this.newTaskTitle.trim()) return;
 
       try {
-        // CORREÇÃO MANTIDA: Rota deve ser /tasks
-        await axios.post(`${API_URL}/tasks`, { title: this.newTaskTitle }, {
+        // CORREÇÃO MANTIDA: Rota deve ser /task
+        await axios.post(`${API_URL}/task`, { title: this.newTaskTitle }, {
           headers: { Authorization: `Bearer ${this.token}` },
         });
         this.newTaskTitle = "";
-        this.loadTasks();
+        this.loadTask();
       } catch (error) {
         this.handleApiCall("criar tarefa", error);
       }
@@ -115,15 +111,15 @@ export default {
  
     async toggleTaskCompleted(taskId, completedStatus) {
       try {
-        // CORREÇÃO MANTIDA: Rota deve ser /tasks
+        // CORREÇÃO MANTIDA: Rota deve ser /task
         await axios.put(
-          `${API_URL}/tasks/${taskId}`,
+          `${API_URL}/task/${taskId}`,
           { completed: completedStatus },
           {
             headers: { Authorization: `Bearer ${this.token}` },
           }
         );
-        this.loadTasks();
+        this.loadTask();
       } catch (error) {
         this.handleApiCall("atualizar tarefa", error);
       }
@@ -131,11 +127,11 @@ export default {
  
     async updateTask(taskId, updateData) {
       try {
-        // CORREÇÃO MANTIDA: Rota deve ser /tasks
-        await axios.put(`${API_URL}/tasks/${taskId}`, updateData, {
+        // CORREÇÃO MANTIDA: Rota deve ser /task
+        await axios.put(`${API_URL}/task/${taskId}`, updateData, {
           headers: { Authorization: `Bearer ${this.token}` },
         });
-        this.loadTasks();
+        this.loadTask();
       } catch (error) {
         this.handleApiCall("atualizar tarefa", error);
       }
@@ -145,18 +141,18 @@ export default {
       if (!confirm("Tem certeza que deseja excluir esta tarefa?")) return;
 
       try {
-        // CORREÇÃO MANTIDA: Rota deve ser /tasks
-        await axios.delete(`${API_URL}/tasks/${taskId}`, {
+        // CORREÇÃO MANTIDA: Rota deve ser /task
+        await axios.delete(`${API_URL}/task/${taskId}`, {
           headers: { Authorization: `Bearer ${this.token}` },
         });
-        this.loadTasks();
+        this.loadTask();
       } catch (error) {
         if (error.response?.status === 403) {
           alert("Ação proibida: Você não tem permissão para excluir esta tarefa.");
         } else {
           this.handleApiCall("excluir tarefa", error);
         }
-        this.loadTasks();
+        this.loadTask();
       }
     },
 
@@ -164,7 +160,7 @@ export default {
       localStorage.clear();
       this.token = null;
       this.userRole = "user";
-      this.tasks = [];
+      this.task = [];
       this.authMessage = "Você saiu do sistema.";
       this.authSuccess = true;
     },

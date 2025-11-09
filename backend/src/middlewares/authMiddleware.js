@@ -1,7 +1,7 @@
 // backend/src/middlewares/authMiddleware.js
 
 const jwt = require('jsonwebtoken');
-const env = require('../config/env'); // IMPORTAÇÃO
+const env = require('../config/env');
 
 // Middleware para verificar se o JWT é válido e injetar o user_id na requisição
 const authMiddleware = (req, res, next) => {

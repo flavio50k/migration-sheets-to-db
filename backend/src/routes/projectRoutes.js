@@ -11,17 +11,17 @@ const router = express.Router();
 // 2. Aplica o middleware de autenticação a todas as rotas de tarefa
 router.use(authMiddleware);
 
-// 3. Define as rotas usando o router (agora protegidas)
+// 3. Define as rotas usando o router
 // READ - GET /tasks
 router.get('/', projectController.getAll); 
 
-// CREATE - POST /tasks (CORRIGIDO: Usando 'create' em vez de 'createTask')
+// CREATE - POST /tasks
 router.post('/', validateBody, projectController.create); 
 
-// DELETE - DELETE /tasks/:id (CORRIGIDO: Usando 'exclude' em vez de 'deleteTask')
+// DELETE - DELETE /tasks/:id
 router.delete('/:id', projectController.exclude);
 
-// UPDATE - PUT /tasks/:id (CORRIGIDO: Usando 'update' em vez de 'updateTask')
+// UPDATE - PUT /tasks/:id
 router.put('/:id', validateBody, projectController.update);
 
 // 4. Exporta o roteador para ser usado no server.js

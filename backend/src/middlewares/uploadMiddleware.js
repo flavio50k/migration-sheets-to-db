@@ -54,8 +54,6 @@ const upload = multer({
 });
 
 // 4. Wrapper para upload.single
-// Usamos o 'upload.single' diretamente aqui, pois a Multer 2.x tem melhor tratamento de erros
-// quando é chamada por um middleware Express (via express-async-errors)
 const uploadSingle = (fieldName) => {
     return (req, res, next) => {
         // Envolve a chamada do Multer em uma Promise para melhor tratamento assíncrono

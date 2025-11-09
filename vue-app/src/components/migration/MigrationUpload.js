@@ -1,52 +1,76 @@
-/* vue-app/src/components/migration/MigrationUpload.js - Refatorado */
+/* vue-app/src/components/migration/MigrationUpload.js */
 import axios from 'axios';
 
 const API_URL = "/api";
 
 export default {
-  // ... (props e data inalterados, exceto abaixo)
+  name: 'MigrationUpload',
+  props: {
+    /* Propriedade herdada do App.vue para autenticação  */
+    token: {
+      type: String,
+      required: true
+    }
+  },
   data() {
     return {
       selectedFile: null,
       isUploading: false,
       message: null,
       messageType: null,
-      importData: null, // CORRIGIDO: migrationData -> importData
+      migrationData: null,
     };
   },
   methods: {
-    // ... (triggerFileInput e handleFileChange inalterados) ...
+    triggerFileInput() {
+      /* Abre o diálogo nativo de seleção de arquivo */
+      this.$refs.fileInput.click();
+    },
+
+    handleFileChange(event) {
+      // Captura o arquivo selecionado
+      this.selectedFile = event.target.files[0];
+      this.message = this.selectedFile ? `Arquivo '${this.selectedFile.name}' selecionado.` : null;
+      this.messageType = 'info';
+    },
 
     async uploadFile() {
-      // ... (código de validação inalterado) ...
+      if (!this.selectedFile) {
+        this.message = 'Selecione um arquivo para continuar.';
+        this.messageType = 'error';
+        return;
+      }
+
       this.isUploading = true;
       this.message = 'Enviando arquivo... Por favor, aguarde.';
       this.messageType = 'info';
-      this.importData = null; // CORRIGIDO: migrationData -> importData
+      this.migrationData = null;
 
+      /* FormData é essencial para uploads de arquivos via API REST */
       const formData = new FormData();
       formData.append('file', this.selectedFile);
 
       try {
-        // CORREÇÃO CRÍTICA: Rota alterada para alinhamento com a nomenclatura Task
-        const response = await axios.post(`${API_URL}/tasks/upload`, formData, { 
+        const response = await axios.post(`${API_URL}/migrations/upload`, formData, {
           headers: {
-            'Content-Type': 'multipart/form-data', 
+            'Content-Type': 'multipart/form-data', // Essencial para o upload
             'Authorization': `Bearer ${this.token}`,
           },
         });
 
-        this.message = 'Upload realizado com sucesso! Uma nova Tarefa foi criada para processamento.';
+        /* O backend retornará o status 200 e os metadados do arquivo em caso de sucesso */
+        this.message = 'Upload realizado com sucesso! Pronto para o próximo passo.';
         this.messageType = 'success';
-        this.importData = response.data.file; // CORRIGIDO: migrationData -> importData
-        this.$emit('migration-complete'); 
-        
+        this.migrationData = response.data.file;
+
       } catch (error) {
-        // ... (código de erro inalterado) ...
+        console.error('Erro no upload:', error);
+        this.message = error.response?.data?.error?.message || 'Erro ao fazer upload da planilha. Verifique os logs do Backend.';
+        this.messageType = 'error';
       } finally {
         this.isUploading = false;
-        this.selectedFile = null; 
-        this.$refs.fileInput.value = null;
+        this.selectedFile = null; // Limpa o arquivo selecionado
+        this.$refs.fileInput.value = null; // Reseta o input de arquivo
       }
     }
   }
