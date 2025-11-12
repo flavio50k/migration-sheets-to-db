@@ -1,10 +1,10 @@
-// backend/src/routes/migrationRoutes.js (CORRIGIDO)
+// backend/src/routes/migrationRoutes.js
 
 const express = require('express');
-const migrationController = require('../controllers/MigrationController');
+const migrationController = require('../controllers/migrationController');
 const authMiddleware = require('../middlewares/authMiddleware');
 // Importa a função fábrica do middleware de upload
-const uploadMiddleware = require('../middlewares/uploadMiddleware'); 
+const uploadMiddleware = require('../middlewares/uploadMiddleware');
 
 const router = express.Router();
 
@@ -12,11 +12,10 @@ const router = express.Router();
 router.use(authMiddleware);
 
 // POST /api/migrations/upload
-// CORREÇÃO: Chamamos uploadMiddleware com o nome do campo ('file') para obter
-// o middleware real que o Express deve executar.
+// Chamamos uploadMiddleware ('file') diretamente, pois ela é a função exportada.
 router.post(
-    '/upload', 
-    uploadMiddleware('file'), // O nome do campo no FormData do Frontend deve ser 'file'
+    '/:taskId/upload',
+    uploadMiddleware('file'),
     migrationController.uploadAndParse
 );
 

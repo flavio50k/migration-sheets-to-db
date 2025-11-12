@@ -14,7 +14,7 @@ export default {
       password: "",
       authMessage: null,
       authSuccess: false,
-      task: [],
+      tasks: [],
       newTaskTitle: "",
       errorMessage: null,
     };
@@ -22,7 +22,7 @@ export default {
   
   mounted() {
     if (this.token) {
-      this.loadTask();
+      this.loadTasks();
     }
   },
 
@@ -38,9 +38,9 @@ export default {
       if (error.response?.status === 401 || error.response?.status === 403) {
           this.logout();
           this.authMessage = this.errorMessage;
-          this.authSuccess = false;
+          this.errorMessage = null; // Limpa o erro da seção de tarefas
       }
-      this.loadTask(); 
+      this.loadTasks(); 
     },
 
     async handleAuth(type) {
@@ -72,7 +72,7 @@ export default {
         this.authSuccess = true;
         this.authMessage = message || `Sucesso! Bem-vindo(a) ${this.username}.`;
         this.password = "";
-        this.loadTask();
+        this.loadtasks();
 
       } catch (error) {
         this.authSuccess = false;
@@ -82,10 +82,10 @@ export default {
       }
     },
 
-    async loadTask() {
+    async loadtasks() {
       this.errorMessage = "";
       try {
-          const response = await axios.get(`${API_URL}/task`, {
+          const response = await axios.get(`${API_URL}/tasks`, {
           headers: { Authorization: `Bearer ${this.token}` },
         });
         this.task = response.data;
@@ -99,11 +99,11 @@ export default {
 
       try {
         // CORREÇÃO MANTIDA: Rota deve ser /task
-        await axios.post(`${API_URL}/task`, { title: this.newTaskTitle }, {
+        await axios.post(`${API_URL}/tasks`, { title: this.newTaskTitle }, {
           headers: { Authorization: `Bearer ${this.token}` },
         });
         this.newTaskTitle = "";
-        this.loadTask();
+        this.loadTasks();
       } catch (error) {
         this.handleApiCall("criar tarefa", error);
       }
@@ -113,13 +113,13 @@ export default {
       try {
         // CORREÇÃO MANTIDA: Rota deve ser /task
         await axios.put(
-          `${API_URL}/task/${taskId}`,
+          `${API_URL}/tasks/${taskId}`,
           { completed: completedStatus },
           {
             headers: { Authorization: `Bearer ${this.token}` },
           }
         );
-        this.loadTask();
+        this.loadTasks();
       } catch (error) {
         this.handleApiCall("atualizar tarefa", error);
       }
@@ -128,10 +128,10 @@ export default {
     async updateTask(taskId, updateData) {
       try {
         // CORREÇÃO MANTIDA: Rota deve ser /task
-        await axios.put(`${API_URL}/task/${taskId}`, updateData, {
+        await axios.put(`${API_URL}/tasks/${taskId}`, updateData, {
           headers: { Authorization: `Bearer ${this.token}` },
         });
-        this.loadTask();
+        this.loadTasks();
       } catch (error) {
         this.handleApiCall("atualizar tarefa", error);
       }
@@ -142,17 +142,17 @@ export default {
 
       try {
         // CORREÇÃO MANTIDA: Rota deve ser /task
-        await axios.delete(`${API_URL}/task/${taskId}`, {
+        await axios.delete(`${API_URL}/tasks/${taskId}`, {
           headers: { Authorization: `Bearer ${this.token}` },
         });
-        this.loadTask();
+        this.loadTasks();
       } catch (error) {
         if (error.response?.status === 403) {
           alert("Ação proibida: Você não tem permissão para excluir esta tarefa.");
         } else {
           this.handleApiCall("excluir tarefa", error);
         }
-        this.loadTask();
+        this.loadTasks();
       }
     },
 
@@ -160,7 +160,7 @@ export default {
       localStorage.clear();
       this.token = null;
       this.userRole = "user";
-      this.task = [];
+      this.tasks = [];
       this.authMessage = "Você saiu do sistema.";
       this.authSuccess = true;
     },

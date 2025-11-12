@@ -5,7 +5,7 @@ const env = require('./env');
 
 // --- 1. CONFIGURAÇÕES DAS POOLS ---
 
-// Pool Interno (projeto_db): Para as operações normais do backend (users, projects)
+// Pool Interno (projeto_db): Para as operações normais do backend (users, tasks)
 const internalDbConfig = {
     host: env.DB_HOST,
     user: env.DB_USER,
@@ -17,17 +17,17 @@ const internalDbConfig = {
 };
 const internalPool = mysql.createPool(internalDbConfig);
 
-// Pool Externo (consultorio_teste): Para a leitura dos dados de migração
-const externalDbConfig = {
-    host: env.EXTERNAL_DB_HOST,
-    user: env.EXTERNAL_DB_USER,
-    password: env.EXTERNAL_DB_PASSWORD,
-    database: env.EXTERNAL_DB_NAME,
+// Pool de Destino (consultorio_teste): Para a leitura dos dados de migração
+const targetDbConfig = {
+    host: env.TARGET_DB_HOST,
+    user: env.TARGET_DB_USER, 
+    password: env.TARGET_DB_PASSWORD,
+    database: env.TARGET_DB_NAME,
     waitForConnections: true,
     connectionLimit: 5, // Uma pool menor, pois o uso é intermitente
     queueLimit: 0
 };
-const externalPool = mysql.createPool(externalDbConfig);
+const targetPool = mysql.createPool(targetDbConfig);
 
 const saltRounds = 10; 
 // O usuário admin padrão é definido aqui
@@ -124,8 +124,8 @@ async function initializeDatabase() {
             
             // 3. Testa a conexão da Pool Externa (consultorio_teste)
             // Esta conexão não cria tabelas, apenas verifica se o DB de origem existe.
-            if (env.EXTERNAL_DB_NAME) { // Só tenta se a variável estiver definida
-                await checkConnection(`DB Externo (${env.EXTERNAL_DB_NAME})`, externalPool);
+            if (env.TARGET_DB_NAME) { // Só tenta se a variável estiver definida
+                await checkConnection(`DB Destino (${env.TARGET_DB_NAME})`, targetPool);
             }
 
             return; // Sucesso: Sai do loop
@@ -149,5 +149,5 @@ initializeDatabase();
 module.exports = {
     // Exportamos ambas as pools
     internalPool, // Pool para 'users' e 'tasks' (seu projeto)
-    externalPool  // Pool para 'consultorio_teste' (sua fonte de dados)
+    targetPool  // Pool para 'consultorio_teste' (sua fonte de dados)
 };

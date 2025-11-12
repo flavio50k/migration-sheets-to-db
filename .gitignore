@@ -47,7 +47,8 @@ data/mysql/
 Thumbs.db  # Arquivos do Windows
 
 # ------------------------------------
-# 5. ARQUIVOS DE UPLOAD DE DADOS
+# 5. ARQUIVOS DE UPLOAD DE DADOS E OUTROS
 # NÃO versionar arquivos grandes de planilhas!
 # ------------------------------------
 backend/uploads/
+Estrutura de Pastas.txt

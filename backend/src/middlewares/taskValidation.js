@@ -1,3 +1,5 @@
+// ./backend/src/middlewares/taskValidation.js
+
 const Joi = require('joi');
 
 // Define o esquema de validação
@@ -38,7 +40,7 @@ const validateBody = (req, res, next) => {
             completed: Joi.boolean()
             // Adiciona .min(1) para garantir que pelo menos UM campo seja enviado na requisição PUT
         }).min(1).messages({
-            'object.min': 'Pelo menos um dos campos ("title" ou "completed") deve ser fornecido para atualização.'
+            'object.min': 'Pelo menos um dos campos (\"title\" ou \"completed\") deve ser fornecido para atualização da tarefa.'
         });
     }
 

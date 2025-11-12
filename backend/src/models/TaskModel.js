@@ -1,4 +1,4 @@
-// ./backend/src/models/ProjectModel.js
+// ./backend/src/models/TaskModel.js
 const { internalPool } = require('../config/database');
 
 // --- GET ALL (Lógica de Role) ---
@@ -7,7 +7,7 @@ const getAll = async (userId) => {
     let params;
 
     if (userId) {
-        // Usuário comum: Filtra SOMENTE pelos projetos criados por este usuário.
+        // Usuário comum: Filtra SOMENTE pelas tarefas criadoa por este usuário.
         query = 'SELECT id, user_id, title, completed, created_at FROM tasks WHERE user_id = ? ORDER BY created_at DESC';
         params = [userId];
     } else {
@@ -16,11 +16,11 @@ const getAll = async (userId) => {
         params = [];
     }
     
-    const [projects] = await internalPool.execute(query, params); 
-    return projects;
+    const [tasks] = await internalPool.execute(query, params); 
+    return tasks;
 };
 
-// --- CREATE PROJECT ---
+// --- CREATE TASK ---
 const create = async (userId, title) => {
     const [result] = await internalPool.execute(
         'INSERT INTO tasks (user_id, title) VALUES (?, ?)',
@@ -38,11 +38,11 @@ const findById = async (id, userId) => {
     
     const params = userId ? [id, userId] : [id];
 
-    const [project] = await internalPool.execute(query, params);
-    return project;
+    const [task] = await internalPool.execute(query, params);
+    return task;
 };
 
-// --- UPDATE PROJECT ---
+// --- UPDATE TASK ---
 const update = async (id, userId, title, completed) => {
     let setClauses = [];
     let params = [];
@@ -70,13 +70,13 @@ const update = async (id, userId, title, completed) => {
     return result.affectedRows > 0;
 };
 
-// --- DELETE PROJECT (Usuário Comum) ---
+// --- DELETE TASK (Usuário Comum) ---
 const exclude = async (id, userId) => {
     const [result] = await internalPool.execute('DELETE FROM tasks WHERE id = ? AND user_id = ?', [id, userId]);
     return result.affectedRows > 0;
 };
 
-// --- DELETE PROJECT (Admin) ---
+// --- DELETE TASK (Admin) ---
 const excludeAny = async (id) => {
     const [result] = await internalPool.execute('DELETE FROM tasks WHERE id = ?', [id]);
     return result.affectedRows > 0;

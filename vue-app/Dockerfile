@@ -16,6 +16,9 @@ FROM nginx:stable-alpine AS production-stage
 # Copia os arquivos gerados (do Stage 1) para o diretório de serviço do Nginx
 COPY --from=build-stage /app/dist /usr/share/nginx/html
 
+# Copia o arquivo de configuração do Nginx para o local padrão
+COPY vue-app/nginx.conf /etc/nginx/conf.d/default.conf
+
 # Expor a porta 80, que é a porta padrão do Nginx
 EXPOSE 80
 

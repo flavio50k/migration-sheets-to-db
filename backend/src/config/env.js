@@ -13,10 +13,10 @@ module.exports = {
     PORT: process.env.PORT || 3000,
     
     // NOVO: Variáveis do Banco de Dados Externo/Migração (consultorio_teste)
-    EXTERNAL_DB_HOST: process.env.EXTERNAL_DB_HOST || process.env.DB_HOST, 
-    EXTERNAL_DB_USER: process.env.EXTERNAL_DB_USER || 'root',
-    EXTERNAL_DB_PASSWORD: process.env.EXTERNAL_DB_PASSWORD || process.env.DB_PASSWORD,
-    EXTERNAL_DB_NAME: process.env.EXTERNAL_DB_NAME, // A ÚNICA DIFERENÇA DEVE SER O NOME DO DB
+    TARGET_DB_HOST: process.env.TARGET_DB_HOST || process.env.DB_HOST,
+    TARGET_DB_USER: process.env.TARGET_DB_USER || 'root',
+    TARGET_DB_PASSWORD: process.env.TARGET_DB_PASSWORD || process.env.DB_PASSWORD,
+    TARGET_DB_NAME: process.env.TARGET_DB_NAME,
     
     // VARIÁVEIS DE SEGURANÇA (JWT)
     JWT_SECRET: process.env.JWT_SECRET || 'fallback_secret_para_dev_nao_usar_em_prod', 

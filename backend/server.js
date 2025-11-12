@@ -4,7 +4,7 @@ const express = require('express');
 const cors = require('cors');
 require('express-async-errors');
 
-const projectRoutes = require('./src/routes/projectRoutes')
+const taskRoutes = require('./src/routes/taskRoutes')
 const userRoutes = require('./src/routes/userRoutes');
 const migrationRoutes = require('./src/routes/migrationRoutes');
 const errorMiddleware = require('./src/middlewares/errorMiddleware');
@@ -27,8 +27,8 @@ app.use(express.json());
 // Rotas de Autenticação
 app.use('/api/users', userRoutes);
 
-// Configura o roteador de PROJETOS
-app.use('/api/projects', projectRoutes);
+// Configura o roteador de TAREFAS
+app.use('/api/tasks', taskRoutes);
 
 // Rotas de MIGRAÇÃO
 app.use('/api/migrations', migrationRoutes); // Ponto de entrada para uploads
@@ -42,5 +42,5 @@ app.use(errorMiddleware);
 
 // Inicia o servidor Express
 app.listen(port, () => {
-    console.log(`Backend rodando em http://localhost:${port}`);
+    console.log(`🚀 Backend rodando em http://localhost:${port}`);
 });

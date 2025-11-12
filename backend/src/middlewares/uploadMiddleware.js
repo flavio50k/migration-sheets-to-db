@@ -1,4 +1,4 @@
-// backend/src/middlewares/uploadMiddleware.js (ATUALIZADO PARA MULTER 2.x)
+// backend/src/middlewares/uploadMiddleware.js
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');

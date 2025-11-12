@@ -24,14 +24,14 @@
       <MigrationUpload :token="token" @migration-complete="loadTasks" />
       <hr>
 
-      <h3>Gestão de Projetos (Tasks)</h3>
+      <h3>Gestão de Tarefas (Tasks)</h3>
       <button @click="loadTasks">Carregar/Atualizar Tarefas</button>
 
       <div class="new-task-area">
-        <input type="text" v-model="newTaskTitle" placeholder="Título do novo projeto/tarefa"
+        <input type="text" v-model="newTaskTitle" placeholder="Título da nova tarefa"
           @keyup.enter="createTask" />
         <button @click="createTask" :disabled="!newTaskTitle.trim()">
-          Adicionar Projeto
+          Adicionar Tarefa
         </button>
       </div>
 
@@ -47,8 +47,6 @@
 
 <script>
 import AppLogic from './App.js'; // Importa o objeto de lógica/script
-
-// 🐛 CORRIGIDO: Atualiza o caminho para a nova estrutura de pastas
 import TaskItem from "./components/task/TaskItem.vue";
 import MigrationUpload from "./components/migration/MigrationUpload.vue";
 
@@ -59,8 +57,7 @@ export default {
     TaskItem,
     MigrationUpload,
   },
-  // 2. Espalha todas as propriedades de data, methods, e mounted do App.js 
-  ...AppLogic,
+  mixins: [AppLogic] // Usa o mixin para injetar a lógica do App.js
 };
 </script>
 

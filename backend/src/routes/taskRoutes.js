@@ -1,8 +1,8 @@
-// taskRoutes.js (CORRIGIDO)
+// backend/src/routes/taskRoutes.js
 
 const express = require('express');
-const projectController = require('../controllers/projectController');
-const { validateBody } = require('../middlewares/projectValidation');
+const taskController = require('../controllers/taskController');
+const { validateBody } = require('../middlewares/taskValidation');
 const authMiddleware = require('../middlewares/authMiddleware'); 
 
 // 1. Cria a instância do roteador
@@ -13,16 +13,16 @@ router.use(authMiddleware);
 
 // 3. Define as rotas usando o router
 // READ - GET /tasks
-router.get('/', projectController.getAll); 
+router.get('/', taskController.getAll); 
 
 // CREATE - POST /tasks
-router.post('/', validateBody, projectController.create); 
+router.post('/', validateBody, taskController.create); 
 
 // DELETE - DELETE /tasks/:id
-router.delete('/:id', projectController.exclude);
+router.delete('/:id', taskController.exclude);
 
 // UPDATE - PUT /tasks/:id
-router.put('/:id', validateBody, projectController.update);
+router.put('/:id', validateBody, taskController.update);
 
 // 4. Exporta o roteador para ser usado no server.js
 module.exports = router;
