@@ -1,4 +1,4 @@
-// backend/src/controllers/MigrationController.js
+// backend/src/controllers/migrationController.js
 const fs = require('fs');
 const path = require('path');
 const env = require('../config/env'); // Para targetDbName
