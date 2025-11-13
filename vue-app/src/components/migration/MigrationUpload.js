@@ -10,6 +10,11 @@ export default {
     token: {
       type: String,
       required: true
+    },
+    /* ID da Tarefa para rotear o upload */
+    taskId: {
+      type: [String, Number],
+      required: true
     }
   },
   data() {
@@ -28,7 +33,7 @@ export default {
     },
 
     handleFileChange(event) {
-      // Captura o arquivo selecionado
+      /* Captura o arquivo selecionado */
       this.selectedFile = event.target.files[0];
       this.message = this.selectedFile ? `Arquivo '${this.selectedFile.name}' selecionado.` : null;
       this.messageType = 'info';
@@ -51,27 +56,27 @@ export default {
       formData.append('file', this.selectedFile);
 
       try {
-        const response = await axios.post(`${API_URL}/migrations/upload`, formData, {
+        /* Inclui o ID da tarefa no endpoint */
+        const response = await axios.post(`${API_URL}/tasks/${this.taskId}/upload`, formData, {
           headers: {
-            'Content-Type': 'multipart/form-data', // Essencial para o upload
+            'Content-Type': 'multipart/form-data',
             'Authorization': `Bearer ${this.token}`,
           },
         });
 
-        /* O backend retornará o status 200 e os metadados do arquivo em caso de sucesso */
         this.message = 'Upload realizado com sucesso! Pronto para o próximo passo.';
         this.messageType = 'success';
         this.migrationData = response.data.file;
+        /* Opcional: emitir evento para que a lista de tarefas atualize, se necessário */
+        this.$emit('migration-complete');
 
       } catch (error) {
-        console.error('Erro no upload:', error);
-        this.message = error.response?.data?.error?.message || 'Erro ao fazer upload da planilha. Verifique os logs do Backend.';
-        this.messageType = 'error';
+        this.isUploading = false;
+        this.selectedFile = null;
       } finally {
         this.isUploading = false;
-        this.selectedFile = null; // Limpa o arquivo selecionado
-        this.$refs.fileInput.value = null; // Reseta o input de arquivo
+        this.selectedFile = null;
       }
-    }
-  }
+    },
+  },
 };

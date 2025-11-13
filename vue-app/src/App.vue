@@ -20,48 +20,36 @@
         <h2>Suas Tarefas (Role: {{ userRole }})</h2>
         <button @click="logout">Sair</button>
       </div>
-
-      <MigrationUpload :token="token" @migration-complete="loadTasks" />
-      <hr>
-
-      <h3>Gestão de Tarefas (Tasks)</h3>
-      <button @click="loadTasks">Carregar/Atualizar Tarefas</button>
-
-      <div class="new-task-area">
-        <input type="text" v-model="newTaskTitle" placeholder="Título da nova tarefa"
-          @keyup.enter="createTask" />
-        <button @click="createTask" :disabled="!newTaskTitle.trim()">
-          Adicionar Tarefa
-        </button>
-      </div>
-
-      <p v-if="errorMessage" class="error-msg">{{ errorMessage }}</p>
-
-      <ul class="task-list">
-        <TaskItem v-for="task in tasks" :key="task.id" :task="task" :userRole="userRole" @delete-task="deleteTask"
-          @toggle-complete="toggleTaskCompleted" @update-task="updateTask" />
-      </ul>
+      
+      <router-view 
+        :token="token" 
+        :userRole="userRole" 
+      />
     </div>
   </div>
 </template>
 
 <script>
-import AppLogic from './App.js'; // Importa o objeto de lógica/script
-import TaskItem from "./components/task/TaskItem.vue";
-import MigrationUpload from "./components/migration/MigrationUpload.vue";
+import AppLogic from './App.js'; 
 
 export default {
   name: "App",
-  // 1. O componente Vue precisa declarar quais filhos ele usará
-  components: {
-    TaskItem,
-    MigrationUpload,
-  },
-  mixins: [AppLogic] // Usa o mixin para injetar a lógica do App.js
+  mixins: [AppLogic],
+  
+  watch: {
+    token(newToken) {
+      if (newToken) {
+        // Navega após um LOGIN bem-sucedido
+        this.$router.push({ name: 'TaskList' }); 
+      } else {
+        // Navega após um LOGOUT ou erro 401 forçado
+        this.$router.push('/');
+      }
+    }
+  }
 };
 </script>
 
 <style lang="scss">
-/* Importa o arquivo de estilos SCSS para uso global no componente */
 @import "./App.scss";
 </style>

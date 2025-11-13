@@ -39,5 +39,18 @@ export default {
       }
       this.isEditing = false;
     },
+    handleClick() {
+      // Se a tarefa já está concluída, não faz sentido editar ou selecionar (opcional)
+      if (this.task.completed) {
+        this.$emit('select-task', this.task.id);
+        return;
+      }
+
+      // Se o título está sendo editável ao clicar (com um duplo clique para edição real)
+      // você pode escolher entre navegação ou edição. Vou priorizar a navegação.
+
+      // Emite o evento para navegação
+      this.$emit('select-task', this.task.id);
+    },
   },
 };
