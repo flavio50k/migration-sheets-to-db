@@ -57,7 +57,8 @@ export default {
 
       try {
         /* Inclui o ID da tarefa no endpoint */
-        const response = await axios.post(`${API_URL}/tasks/${this.taskId}/upload`, formData, {
+        /* const response = await axios.post(`${API_URL}/tasks/${this.taskId}/upload`, formData, { */
+         const response = await axios.post(`${API_URL}/migrations/${this.taskId}/upload`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             'Authorization': `Bearer ${this.token}`,

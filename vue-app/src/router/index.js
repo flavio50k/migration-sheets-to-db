@@ -1,30 +1,34 @@
-/* vue-app/src/router/index.js (NOVO ARQUIVO) */
+/* vue-app/src/router/index.js */
 import { createRouter, createWebHistory } from 'vue-router';
-/* As views serão criadas nos próximos passos */
 import TaskList from '../views/TaskList.vue';
 import TaskDetail from '../views/TaskDetail.vue'; 
 
 const routes = [
-  /* Redireciona a raiz para a lista de tarefas, que será protegida pelo guarda */
-  { path: '/', redirect: '/tasks' }, 
+  /* Redireciona a raiz para a lista de tarefas, que será protegida pelo guarda
+  { path: '/', redirect: '/tasks' }, */
   {
-    path: '/tasks',
-    name: 'TaskList',
+    path: '/',
+    name: 'TaskList', // A rota raiz agora é a TaskList
     component: TaskList,
-    meta: { requiresAuth: true } /* Protege a rota */
+    meta: { requiresAuth: true }
   },
   {
-    /* Rota dinâmica para o detalhe da tarefa */
+    path: '/tasks',
+    // Redireciona /tasks para / se TaskList for a Home
+    redirect: '/', 
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/tasks/:id', 
     name: 'TaskDetail',
     component: TaskDetail,
-    props: true, /* Permite passar o :id como prop para TaskDetail.vue */
+    props: true, 
     meta: { requiresAuth: true }
   },
 ];
 
 const router = createRouter({
-  history: createWebHistory(), /* Modo histórico (requer a config no nginx.conf, que você já tem) */
+  history: createWebHistory(),
   routes,
 });
 

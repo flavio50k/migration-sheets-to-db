@@ -22,6 +22,3 @@
     </div>
   </li>
 </template>
-
-<script src="./TaskItem.js"></script>
-<style lang="scss" src="./TaskItem.scss" scoped></style>
