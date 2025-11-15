@@ -1,22 +1,24 @@
 /* vue-app/src/router/index.js */
 import { createRouter, createWebHistory } from 'vue-router';
+import LoginView from '../views/Login.vue';
 import TaskList from '../views/TaskList.vue';
-import TaskDetail from '../views/TaskDetail.vue'; 
+import TaskDetail from '../views/TaskDetail.vue';
 
 const routes = [
-  /* Redireciona a raiz para a lista de tarefas, que será protegida pelo guarda
-  { path: '/', redirect: '/tasks' }, */
   {
-    path: '/',
-    name: 'TaskList', // A rota raiz agora é a TaskList
-    component: TaskList,
-    meta: { requiresAuth: true }
+    path: '/login', /* Rota explícita para o Login */
+    name: 'Login',
+    component: LoginView,
   },
   {
+    path: '/', 
+    redirect: '/tasks' /* Redireciona a raiz para as tarefas (fluxo normal do app) */
+  }, 
+  {
     path: '/tasks',
-    // Redireciona /tasks para / se TaskList for a Home
-    redirect: '/', 
-    meta: { requiresAuth: true }
+    name: 'TaskList',
+    component: TaskList,
+    meta: { requiresAuth: true } /* Protege a rota */
   },
   {
     path: '/tasks/:id', 
@@ -25,6 +27,8 @@ const routes = [
     props: true, 
     meta: { requiresAuth: true }
   },
+  /* Opcional: catch-all */
+  { path: '/:pathMatch(.*)*', redirect: '/' } 
 ];
 
 const router = createRouter({
@@ -34,15 +38,21 @@ const router = createRouter({
 
 /* Guarda de navegação global para autenticação */
 router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('token');
-  /* Se a rota requer autenticação E o token não existe... */
-  if (to.meta.requiresAuth && !token && to.path !== '/') {
-    /* Redireciona para o caminho raiz (onde App.vue mostrará a tela de Login) */
-    next('/'); 
-  } else {
-    /* Permite a navegação */
-    next();
+  const token = sessionStorage.getItem('token'); 
+  const requiresAuth = to.meta.requiresAuth;
+
+  /* 1. Acesso Negado: Rota protegida E não tem token */
+  if (requiresAuth && !token) {
+    if (to.name !== 'Login') {
+      return next({ name: 'Login' }); /* Redireciona para o componente Login.vue */
+    }
+  /* 2. Já Autenticado: Tem token E tenta acessar a tela de Login */
+  } else if (to.name === 'Login' && token) {
+    return next({ name: 'TaskList' }); /* Redireciona para o App principal */
   }
+  
+  /* 3. Caso padrão: segue o fluxo normal */
+  next();
 });
 
 export default router;
