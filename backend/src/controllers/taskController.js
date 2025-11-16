@@ -2,16 +2,17 @@
 
 const taskModel = require('../models/TaskModel');
 
-// --- GET ALL (Lógica de Role) ---
+// --- GET ALL (Lógica de Role e Filtro de Status) ---
 const getAll = async (req, res) => {
     const { id: userId, role } = req.user;
+    const { status } = req.query; 
 
     let tasks;
 
     if (role === 'admin') {
-        tasks = await taskModel.getAll(null);
+        tasks = await taskModel.getAll(null, status);
     } else {
-        tasks = await taskModel.getAll(userId);
+        tasks = await taskModel.getAll(userId, status); 
     }
 
     return res.status(200).json(tasks);

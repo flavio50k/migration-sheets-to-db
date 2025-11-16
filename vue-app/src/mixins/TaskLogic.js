@@ -10,6 +10,7 @@ export default {
       tasks: [],
       newTaskTitle: "",
       errorMessage: null,
+      filterStatus: 'all',
     };
   },
   
@@ -45,16 +46,24 @@ export default {
     },
 
     async loadTasks() {
-      this.errorMessage = null;
+      // Usa o estado local do filtro
+      const statusParam = this.filterStatus === 'all' ? '' : `?status=${this.filterStatus}`;
+
       try {
-        const response = await axios.get(`${API_URL}/tasks`, {
+        const response = await axios.get(`${API_URL}/tasks${statusParam}`, {
           headers: { Authorization: `Bearer ${this.token}` },
         });
-        /* Adaptação: Assumindo que o backend retorna { tasks: [...] } ou apenas [...] */
-        this.tasks = response.data.tasks || response.data; 
+        this.tasks = response.data;
+        this.errorMessage = null;
       } catch (error) {
         this.handleApiCall("carregar tarefas", error);
       }
+    },
+    
+    // NOVO: Método para lidar com a mudança do filtro
+    handleFilterChange() {
+        // Recarrega as tarefas sempre que o filtro muda
+        this.loadTasks();
     },
     
     async createTask() {

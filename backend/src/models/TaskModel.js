@@ -1,22 +1,43 @@
 // ./backend/src/models/TaskModel.js
 const { internalPool } = require('../config/database');
 
-// --- GET ALL (Lógica de Role) ---
-const getAll = async (userId) => {
-    let query;
-    let params;
+// --- GET ALL (Com Filtro de Status) ---
 
+/**
+ * Busca todas as tarefas, opcionalmente filtrando por usuário e status.
+ * @param {number|null} userId - ID do usuário (null para admin).
+ * @param {string} status - 'open', 'completed' ou undefined/null para 'all'.
+ * @returns {Array} Lista de tarefas.
+ */
+
+const getAll = async (userId, status) => {
+    let query = 'SELECT id, user_id, title, completed, created_at FROM tasks';
+    const params = [];
+    const conditions = [];
+
+    // 1. Filtro por Usuário
     if (userId) {
-        // Usuário comum: Filtra SOMENTE pelas tarefas criadoa por este usuário.
-        query = 'SELECT id, user_id, title, completed, created_at FROM tasks WHERE user_id = ? ORDER BY created_at DESC';
-        params = [userId];
-    } else {
-        // Administrador: Busca TODAS as tarefas no sistema.
-        query = 'SELECT id, user_id, title, completed, created_at FROM tasks ORDER BY created_at DESC';
-        params = [];
+        conditions.push('user_id = ?');
+        params.push(userId);
     }
-    
-    const [tasks] = await internalPool.execute(query, params); 
+
+    // 2. Filtro por Status
+    // 'open' = completed = 0 | 'completed' = completed = 1
+    if (status === 'open') {
+        conditions.push('completed = 0');
+    } else if (status === 'completed') {
+        conditions.push('completed = 1');
+    }
+
+    // 3. Monta a cláusula WHERE
+    if (conditions.length > 0) {
+        query += ' WHERE ' + conditions.join(' AND ');
+    }
+
+    query += ' ORDER BY created_at DESC';
+
+    // Executa a consulta
+    const [tasks] = await internalPool.execute(query, params);
     return tasks;
 };
 
@@ -32,10 +53,10 @@ const create = async (userId, title) => {
 // --- FIND BY ID ---
 const findById = async (id, userId) => {
     // Se userId for fornecido, filtra. Senão, busca apenas por ID (uso interno do Admin).
-    const query = userId 
+    const query = userId
         ? 'SELECT id, user_id, title, completed, created_at FROM tasks WHERE id = ? AND user_id = ?'
         : 'SELECT id, user_id, title, completed, created_at FROM tasks WHERE id = ?';
-    
+
     const params = userId ? [id, userId] : [id];
 
     const [task] = await internalPool.execute(query, params);
@@ -54,7 +75,7 @@ const update = async (id, userId, title, completed) => {
 
     if (completed !== undefined) {
         setClauses.push('completed = ?');
-        params.push(completed ? 1 : 0); 
+        params.push(completed ? 1 : 0);
     }
 
     if (setClauses.length === 0) {
@@ -63,7 +84,7 @@ const update = async (id, userId, title, completed) => {
 
     params.push(id);
     params.push(userId);
-    
+
     const query = `UPDATE tasks SET ${setClauses.join(', ')} WHERE id = ? AND user_id = ?`;
     const [result] = await internalPool.execute(query, params);
 

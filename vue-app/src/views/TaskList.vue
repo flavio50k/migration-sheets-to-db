@@ -2,7 +2,7 @@
   <div class="task-list-view">
 
     <h3>Gestão de Tarefas (Tasks)</h3>
-
+    
     <div class="new-task-area">
       <input type="text" v-model="newTaskTitle" placeholder="Título da nova tarefa" @keyup.enter="createTask" />
       <button @click="createTask" :disabled="!newTaskTitle.trim()">
@@ -10,6 +10,15 @@
       </button>
     </div>
 
+    <div class="filter-area">
+        <label for="task-filter">Filtrar Tarefas:</label>
+        <select id="task-filter" v-model="filterStatus" @change="handleFilterChange">
+            <option value="all">Todas</option>
+            <option value="open">Em Andamento</option>
+            <option value="completed">Finalizadas</option>
+        </select>
+        <button @click="loadTasks" class="refresh-btn">🔄 Atualizar Lista</button>
+    </div>
     <p v-if="errorMessage" class="error-msg">{{ errorMessage }}</p>
 
     <ul class="task-list">
@@ -41,6 +50,7 @@ export default {
   },
   methods: {
     handleSelectTask(taskId) {
+      // Navega para a rota de detalhe da tarefa
       this.$router.push({ name: 'TaskDetail', params: { id: taskId } });
     }
   }
@@ -48,21 +58,32 @@ export default {
 </script>
 
 <style scoped>
-.new-task-area {
-  display: flex;
-  margin: 20px 0;
+/* Estilos para o novo filtro */
+.filter-area {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin: 20px 0;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f8f9fa; /* Fundo claro para realçar */
 }
 
-.new-task-area input {
-  flex-grow: 1;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  margin-right: 10px;
+.filter-area label {
+    font-weight: bold;
+    color: #333;
 }
 
-.error-msg {
-  color: red;
-  font-weight: bold;
+.filter-area select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    min-width: 150px;
+}
+
+.refresh-btn {
+    background-color: #6c757d; /* Cor Cinza para atualizar */
+    color: white;
 }
 </style>
