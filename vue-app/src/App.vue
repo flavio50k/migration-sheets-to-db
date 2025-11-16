@@ -1,9 +1,5 @@
 <template>
   <div id="app">
-    <h1>📋 Projeto FullStack - Tarefas Vue.js</h1>
-    <p>Conectado ao Backend em: **{{ apiUrl }}**</p>
-    <hr />
-    
     <header v-if="token" class="header">
       <h2>Suas Tarefas (Role: {{ userRole }})</h2>
       <button @click="logout">Sair</button> 
@@ -14,7 +10,6 @@
       :userRole="userRole" 
       @update-auth="updateAuth" 
     />
-
   </div>
 </template>
 

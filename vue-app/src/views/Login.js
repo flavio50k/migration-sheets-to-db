@@ -1,7 +1,6 @@
 /* vue-app/src/views/Login.js */
 import axios from "axios";
-/* O Nginx (via docker-compose) faz o proxy reverso de /api para o backend:3000 */
-const API_URL = "/api"; 
+const API_URL = "/api";
 
 export default {
   data() {
@@ -22,11 +21,10 @@ export default {
      * @returns {boolean} true se a autenticação foi bem-sucedida, false caso contrário.
      */
     async authenticate(type) {
-      this.authMessage =
-        type === "login" ? "Tentando login..." : "Tentando registro...";
+      this.authMessage = type === "login" ? "Tentando login..." : "Tentando registro...";
       this.authSuccess = false;
       const endpoint = type === "login" ? "login" : "register";
-
+      
       try {
         const response = await axios.post(`${API_URL}/users/${endpoint}`, {
           username: this.username,
@@ -35,17 +33,17 @@ export default {
 
         const { token, role, message } = response.data;
 
-        /* Armazenar o token e role no sessionStorage */
+        /* Armazenar o token e role no sessionStorage (MANTER CONSISTÊNCIA) */
         sessionStorage.setItem("token", token);
         sessionStorage.setItem("userRole", role);
         
-        /* Notifica o App.vue para atualizar o estado global do token e role */
+        /* Notifica o App.vue para atualizar o estado global (via mixin do App.js) */
         this.$emit('update-auth', { token, role });
 
         this.authSuccess = true;
         this.authMessage = message || `Sucesso! Bem-vindo(a) ${this.username}.`;
         this.password = "";
-        return true; // Retorna sucesso para Login.vue gerenciar a navegação
+        return true; /* Sucesso para a View gerenciar a navegação */
       } catch (error) {
         this.authSuccess = false;
         
@@ -54,7 +52,7 @@ export default {
 
         this.authMessage = `Falha no ${type}: ${errorMessage}`;
         console.error(`Falha ao ${type}:`, error);
-        return false; // Retorna falha
+        return false; /* Retorna falha para a View gerenciar */
       }
     },
   },

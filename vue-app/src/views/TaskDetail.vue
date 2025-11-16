@@ -1,11 +1,9 @@
 <template>
   <div class="task-detail-view">
+
     <h2>Detalhe da Tarefa #{{ taskId }}</h2>
-    <p>
-      Esta é a tela de detalhes para a tarefa com ID **{{ taskId }}**.
-      Aqui, o componente faria uma chamada à API para carregar mais
-      informações sobre a tarefa.
-    </p>
+
+    <MigrationUpload :token="token" :taskId="taskId" @migration-complete="handleMigrationComplete" />
 
     <button @click="$router.push({ name: 'TaskList' })">
       ↩ Voltar para a Lista
@@ -14,13 +12,25 @@
 </template>
 
 <script>
+import MigrationUpload from "../components/migration/MigrationUpload.vue";
+
 export default {
   name: "TaskDetail",
+  components: {
+    MigrationUpload,
+  },
   props: {
-    // Esta prop é injetada automaticamente pelo Vue Router (ver index.js)
     id: {
       type: [String, Number],
       required: true,
+    },
+    token: {
+      type: String,
+      required: true,
+    },
+    userRole: { /* Não é usado diretamente, mas pode ser passado para componentes filhos se necessário */
+      type: String,
+      default: 'user',
     },
   },
   computed: {
@@ -28,6 +38,11 @@ export default {
       return this.id;
     },
   },
+  methods: {
+    handleMigrationComplete() {
+      console.log(`Upload concluído para a Tarefa ID: ${this.taskId}`);
+    }
+  }
 };
 </script>
 
@@ -36,6 +51,10 @@ export default {
   padding: 20px;
   border: 1px solid #007bff;
   border-radius: 8px;
+  margin-top: 20px;
+}
+
+.task-detail-view button {
   margin-top: 20px;
 }
 </style>
