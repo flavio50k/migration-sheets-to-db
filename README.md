@@ -61,47 +61,77 @@ O backend implementa um **sistema robusto de autenticação e autorização**, b
 ## 🧩 Estrutura de Pastas
 
 ```bash
-PROJETO_FULLSTACK (WSL)
-├── .vscode/
+PROJETO_FULLSTACK_MIGRAÇÃO (WSL)
 ├── backend/
+│   ├── node_modules/
 │   ├── src/
 │   │   ├── config/
-│   │   │   └── database.js
+│   │   │   ├── database.js
+│   │   │   └── env.js
 │   │   ├── controllers/
+│   │   │   ├── migrationController.js
 │   │   │   ├── taskController.js
 │   │   │   └── userController.js
 │   │   ├── middlewares/
 │   │   │   ├── adminMiddleware.js
 │   │   │   ├── authMiddleware.js
 │   │   │   ├── errorMiddleware.js
-│   │   │   └── taskValidation.js
+│   │   │   ├── taskValidation.js
+│   │   │   └── uploadMiddleware.js
 │   │   ├── models/
+│   │   │   ├── MigrationModel.js
 │   │   │   ├── TaskModel.js
 │   │   │   └── UserModel.js
-│   │   └── routes/
-│   │       ├── taskRoutes.js
-│   │       └── userRoutes.js
+│   │   ├── routes/
+│   │   │   ├── migrationRoutes.js
+│   │   │   ├── taskRoutes.js
+│   │   │   └── userRoutes.js
+│   ├── uploads/
 │   ├── Dockerfile
 │   ├── nodemon.json
 │   ├── package-lock.json
 │   ├── package.json
-│   └── servers.js
+│   └── server.js
+│
+├── db-init/
+│   └── 01-create-external-db.sql
+│
 ├── vue-app/
-│   ├── public/
-│   │   └── index.html
-│   ├── src/
-│   │   ├── components/
-│   │   │   └── TaskItem.vue
-│   │   ├── App.vue
-│   │   └── main.js
-│   ├── Dockerfile
-│   ├── package.json
+│   ├── public/
+│   │   ├── favicon.ico
+│   │   └── index.html
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── migration/
+│   │   │   │   ├── MigrationUpload.js
+│   │   │   │   ├── MigrationUpload.scss
+│   │   │   │   └── MigrationUpload.vue
+│   │   │   └── task/
+│   │   │       ├── TaskItem.js
+│   │   │       ├── TaskItem.scss
+│   │   │       └── TaskItem.vue
+│   │   ├── mixins/
+│   │   │   └── TaskLogic.js
+│   │   ├── router/
+│   │   │   └── index.js
+│   │   ├── views/
+│   │   │   ├── TaskDetail.vue
+│   │   │   └── TaskList.vue
+│   │   ├── App.js
+│   │   ├── App.scss
+│   │   ├── App.vue
+│   │   └── main.js
+│   ├── Dockerfile
+│   ├── nginx.conf
+│   └── package.json
+│
 ├── .env
 ├── .env.example
 ├── .gitattributes
 ├── .gitignore
 ├── docker-compose.yml
 └── README.md
+
 ```
 
 ## 🐳 Como Executar o Projeto
