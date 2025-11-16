@@ -1,6 +1,18 @@
-/* vue-app/src/components/task/TaskItem.js  */
+/* vue-app/src/components/task/TaskItem.js */
+
+// 1. Importar os componentes do PrimeVue AQUI dentro do JS
+import Card from 'primevue/card';
+import Button from 'primevue/button';
+import Tag from 'primevue/tag';
+
 export default {
   name: "TaskItem",
+  // 2. Registrar os componentes AQUI
+  components: {
+      'pv-card': Card,
+      'pv-button': Button,
+      'pv-tag': Tag
+  },
   props: {
     task: {
       type: Object,
@@ -18,7 +30,6 @@ export default {
     };
   },
   watch: {
-    /* Garante que o campo de edição seja atualizado se a tarefa for recarregada externamente */
     "task.title"(newTitle) {
       this.editableTitle = newTitle;
     },
@@ -26,31 +37,18 @@ export default {
   methods: {
     startEdit() {
       this.isEditing = true;
-      /* Selecionar o input após a renderização (opcional) */
+      /* Precisamos usar setTimeout ou nextTick para garantir que o input renderizou */
       this.$nextTick(() => {
-        this.$el.querySelector(".edit-input").focus();
+        // Tenta achar o input do PrimeVue ou o nativo
+        const input = this.$el.querySelector('input[type="text"]');
+        if(input) input.focus();
       });
     },
     saveEdit() {
-      /* Verifica se o título mudou e não está vazio antes de emitir o evento */
       if (this.editableTitle.trim() && this.editableTitle !== this.task.title) {
-        // Emite o evento 'update-task' para o componente pai (App.vue)
         this.$emit("update-task", this.task.id, { title: this.editableTitle });
       }
       this.isEditing = false;
-    },
-    handleClick() {
-      // Se a tarefa já está concluída, não faz sentido editar ou selecionar (opcional)
-      if (this.task.completed) {
-        this.$emit('select-task', this.task.id);
-        return;
-      }
-
-      // Se o título está sendo editável ao clicar (com um duplo clique para edição real)
-      // você pode escolher entre navegação ou edição. Vou priorizar a navegação.
-
-      // Emite o evento para navegação
-      this.$emit('select-task', this.task.id);
     },
   },
 };

@@ -1,80 +1,37 @@
-/* vue-app/src/views/Login.scss */
 .login-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 80vh;
+    min-height: 80vh;
 }
 
-.auth-card {
-    background: var(--bg-card);
-    padding: 40px;
-    border-radius: 16px;
-    box-shadow: var(--shadow-md);
+.login-card {
     width: 100%;
     max-width: 400px;
+}
+
+.text-center {
     text-align: center;
-
-    h2 {
-        color: var(--text-main);
-        margin-bottom: 5px;
-    }
-
-    .subtitle {
-        color: var(--text-muted);
-        margin-bottom: 30px;
-        font-size: 0.9rem;
-    }
 }
 
-.form-group {
-    margin-bottom: 15px;
-
-    input {
-        width: 100%;
-        padding: 12px;
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        background: #f9fafb;
-        box-sizing: border-box; /* Garante que padding não aumente largura */
-        transition: border-color 0.2s;
-
-        &:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: #fff;
-        }
-    }
+.form-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-top: 10px;
 }
 
-.actions {
+.actions-row {
     display: flex;
     gap: 10px;
-    margin-top: 20px;
-
-    button {
-        flex: 1;
-        padding: 12px;
-        font-weight: 600;
-    }
+    margin-top: 10px;
 }
 
-.btn-primary {
-    background-color: var(--primary);
-    color: white;
-    &:hover { background-color: var(--primary-hover); }
+/* Utilitários de largura (caso não tenha tailwind/bootstrap) */
+.w-full {
+    width: 100%;
 }
 
-.btn-secondary {
-    background-color: transparent;
-    color: var(--text-muted);
-    border: 1px solid var(--border-color);
-    &:hover { background-color: #f3f4f6; color: var(--text-main); }
-}
-
-.message {
-    margin-top: 20px;
-    font-size: 0.9rem;
-    &.success { color: var(--success); }
-    &.error { color: var(--danger); }
+.mt-4 {
+    margin-top: 1.5rem;
 }

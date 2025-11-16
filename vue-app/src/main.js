@@ -1,10 +1,23 @@
-// ./vue-app/src/main.js 
+/* vue-app/src/main.js */
 
 import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';
 
-// Cria e monta a aplicação Vue no elemento <div id="app">
+/* --- IMPORTAÇÕES DO PRIMEVUE --- */
+import PrimeVue from 'primevue/config';
+
+/* Estilo do Tema (Escolhido 'Aura' que é moderno, mas pode ser 'Saga', 'Lara', etc) */
+import 'primevue/resources/themes/aura-light-green/theme.css';      
+/* Estilos Base (Layout Core) */
+import 'primevue/resources/primevue.min.css';                 
+/* Ícones */
+import 'primeicons/primeicons.css';                             
+
 const app = createApp(App);
-app.use(router); // Usa o Vue Router
+
+/* Registrar o Plugin */
+app.use(PrimeVue); 
+app.use(router);
+
 app.mount('#app');

@@ -1,35 +1,62 @@
 <template>
-  <li class="task-card" :class="{ 'is-completed': task.completed }" @click="$emit('select-task', task.id)">
-    
-    <div class="task-left">
-      <label class="custom-checkbox" @click.stop>
-        <input type="checkbox" :checked="task.completed" @change="$emit('toggle-complete', task.id, !task.completed)" />
-        <span class="checkmark"></span>
-      </label>
-
-      <div class="task-info">
-        <input v-if="isEditing" type="text" v-model="editableTitle" class="edit-input" @keyup.enter="saveEdit" @click.stop />
-        <span v-else class="task-title">{{ task.title }}</span>
+    <pv-card class="task-card-prime" :class="{ 'completed-task': task.completed }" @click="$emit('select-task', task.id)">
         
-        <div class="task-meta" v-if="!isEditing">
-            <span class="badge id-badge">#{{ task.id }}</span>
-            <span v-if="userRole === 'admin'" class="badge admin-badge">Admin Only</span>
-        </div>
-      </div>
-    </div>
+        <template #title>
+            <div class="header-row">
+                <div class="left-content">
+                    <input 
+                        type="checkbox" 
+                        class="native-checkbox"
+                        :checked="task.completed" 
+                        @change="$emit('toggle-complete', task.id, !task.completed)" 
+                        @click.stop 
+                    />
+                    
+                    <input 
+                        v-if="isEditing" 
+                        type="text" 
+                        v-model="editableTitle" 
+                        class="prime-input-text" 
+                        @keyup.enter="saveEdit" 
+                        @click.stop 
+                    />
+                    
+                    <span v-else class="title-text">{{ task.title }}</span>
+                </div>
+                
+                <div class="tags-container">
+                    <pv-tag :value="'#' + task.id" severity="secondary" rounded></pv-tag>
+                    <pv-tag v-if="userRole === 'admin'" value="Admin" severity="danger" rounded></pv-tag>
+                </div>
+            </div>
+        </template>
 
-    <div class="task-actions">
-      <button v-if="isEditing" @click.stop="saveEdit" class="btn-icon save" title="Salvar">✓</button>
-      <button v-else @click.stop="startEdit" class="btn-icon edit" title="Editar">✎</button>
+        <template #content>
+            <div class="action-bar">
+                <pv-button 
+                    v-if="isEditing" 
+                    icon="pi pi-check" 
+                    class="p-button-rounded p-button-success p-button-text" 
+                    @click.stop="saveEdit" 
+                />
+                <pv-button 
+                    v-else 
+                    icon="pi pi-pencil" 
+                    class="p-button-rounded p-button-secondary p-button-text" 
+                    @click.stop="startEdit" 
+                />
 
-      <button v-if="userRole === 'admin'" @click.stop="$emit('delete-task', task.id)" class="btn-icon delete" title="Excluir">
-        🗑
-      </button>
-      
-      <span class="arrow-indicator">›</span>
-    </div>
-  </li>
+                <pv-button 
+                    v-if="userRole === 'admin'" 
+                    icon="pi pi-trash" 
+                    class="p-button-rounded p-button-danger p-button-text" 
+                    @click.stop="$emit('delete-task', task.id)" 
+                />
+            </div>
+        </template>
+    </pv-card>
 </template>
 
 <script src="./TaskItem.js"></script>
+
 <style lang="scss" src="./TaskItem.scss" scoped></style>

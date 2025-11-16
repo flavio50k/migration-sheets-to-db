@@ -1,43 +1,39 @@
 <template>
-  <div class="migration-upload-card">
-    <h3>Upload de Planilha de Migração</h3>
-    <p>Utilize esta seção para enviar o arquivo da planilha (ex: `.xlsx`, `.csv`) que contém os dados a serem migrados para o banco de dados **consultorio_teste**.</p>
-    
-    <div class="upload-area">
-      <input
-        type="file"
-        ref="fileInput"
-        @change="handleFileChange"
-        accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-        style="display: none;"
-      />
-      
-      <button 
-        @click="triggerFileInput" 
-        :disabled="isUploading"
-        class="select-file-btn"
-      >
-        {{ selectedFile ? 'Arquivo Selecionado' : 'Selecionar Arquivo' }}
-      </button>
-
-      <span v-if="selectedFile" class="file-name">{{ selectedFile.name }}</span>
+  <div class="upload-card">
+    <div class="upload-header">
+        <i class="pi pi-cloud-upload icon-large"></i>
+        <h3>Importar Planilha</h3>
     </div>
-
-    <button 
-      @click="uploadFile" 
-      :disabled="!selectedFile || isUploading"
-      class="upload-btn"
-    >
-      {{ isUploading ? 'Enviando...' : 'Fazer Upload' }}
-    </button>
     
-    <p v-if="message" :class="messageType === 'success' ? 'success-msg' : 'error-msg'">
-      {{ message }}
-    </p>
+    <div class="upload-body">
+      <input type="file" ref="fileInput" @change="handleFileChange" accept=".xlsx, .csv" style="display: none;" />
+      
+      <div class="file-select-area">
+        <pv-button 
+            label="Selecionar Arquivo" 
+            icon="pi pi-folder-open" 
+            class="p-button-outlined"
+            @click="triggerFileInput" 
+            :disabled="isUploading"
+        />
+        <span v-if="selectedFile" class="file-name">{{ selectedFile.name }}</span>
+        <span v-else class="file-placeholder">Nenhum arquivo selecionado</span>
+      </div>
 
-    <div v-if="migrationData" class="data-preview">
-        <h4>Pré-visualização do Upload:</h4>
-        <pre>{{ migrationData }}</pre>
+      <div class="actions">
+          <pv-button 
+            label="Iniciar Upload" 
+            icon="pi pi-upload" 
+            @click="uploadFile" 
+            :loading="isUploading"
+            :disabled="!selectedFile"
+          />
+      </div>
+
+      <div v-if="message" :class="['status-message', messageType]">
+          <i :class="messageType === 'success' ? 'pi pi-check-circle' : 'pi pi-times-circle'"></i>
+          {{ message }}
+      </div>
     </div>
   </div>
 </template>

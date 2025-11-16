@@ -9,7 +9,9 @@
   "dependencies": {
     "vue": "^3.3.4",
     "axios": "^1.6.2",
-    "vue-router": "^4.2.5"
+    "vue-router": "^4.2.5",
+    "primevue": "^3.45.0", 
+    "primeicons": "^6.0.1"
   },
   "devDependencies": {
     "@vue/cli-service": "~5.0.0",

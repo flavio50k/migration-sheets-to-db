@@ -1,21 +1,19 @@
 /* vue-app/src/components/migration/MigrationUpload.js */
 import axios from 'axios';
+import Button from 'primevue/button';
+import ProgressBar from 'primevue/progressbar';
 
 const API_URL = "/api";
 
 export default {
   name: 'MigrationUpload',
+  components: {
+      'pv-button': Button,
+      'pv-progress': ProgressBar
+  },
   props: {
-    /* Propriedade herdada do App.vue para autenticação  */
-    token: {
-      type: String,
-      required: true
-    },
-    /* ID da Tarefa para rotear o upload */
-    taskId: {
-      type: [String, Number],
-      required: true
-    }
+    token: { type: String, required: true },
+    taskId: { type: [String, Number], required: true }
   },
   data() {
     return {
@@ -23,61 +21,43 @@ export default {
       isUploading: false,
       message: null,
       messageType: null,
-      migrationData: null,
     };
   },
   methods: {
     triggerFileInput() {
-      /* Abre o diálogo nativo de seleção de arquivo */
       this.$refs.fileInput.click();
     },
-
     handleFileChange(event) {
-      /* Captura o arquivo selecionado */
       this.selectedFile = event.target.files[0];
-      this.message = this.selectedFile ? `Arquivo '${this.selectedFile.name}' selecionado.` : null;
-      this.messageType = 'info';
+      this.message = null;
     },
-
     async uploadFile() {
-      if (!this.selectedFile) {
-        this.message = 'Selecione um arquivo para continuar.';
-        this.messageType = 'error';
-        return;
-      }
+      if (!this.selectedFile) return;
 
       this.isUploading = true;
-      this.message = 'Enviando arquivo... Por favor, aguarde.';
-      this.messageType = 'info';
-      this.migrationData = null;
+      this.message = null;
 
-      /* FormData é essencial para uploads de arquivos via API REST */
       const formData = new FormData();
       formData.append('file', this.selectedFile);
 
       try {
-        /* Inclui o ID da tarefa no endpoint */
-        /* const response = await axios.post(`${API_URL}/tasks/${this.taskId}/upload`, formData, { */
-         const response = await axios.post(`${API_URL}/migrations/${this.taskId}/upload`, formData, {
+         await axios.post(`${API_URL}/migrations/${this.taskId}/upload`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             'Authorization': `Bearer ${this.token}`,
           },
         });
 
-        this.message = 'Upload realizado com sucesso! Pronto para o próximo passo.';
+        this.message = 'Upload realizado com sucesso!';
         this.messageType = 'success';
-        this.migrationData = response.data.file;
-        /* Opcional: emitir evento para que a lista de tarefas atualize, se necessário */
         this.$emit('migration-complete');
 
       } catch (error) {
-        this.isUploading = false;
-        this.selectedFile = null;
+        this.message = 'Erro ao enviar o arquivo.';
+        this.messageType = 'error';
       } finally {
         this.isUploading = false;
-        this.selectedFile = null;
       }
-    },
-  },
+    }
+  }
 };

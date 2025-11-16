@@ -2,28 +2,47 @@
 import axios from "axios";
 const API_URL = "/api";
 
+import Card from 'primevue/card';
+import InputText from 'primevue/inputtext';
+import Password from 'primevue/password';
+import Button from 'primevue/button';
+import Message from 'primevue/message';
+
 export default {
-  name: "LoginLogic",
+  name: "LoginView",
+  components: {
+      'pv-card': Card,
+      'pv-input': InputText,
+      'pv-password': Password,
+      'pv-button': Button,
+      'pv-message': Message
+  },
   data() {
     return {
-      /* Dados do formulário de login/registro */
       username: "",
       password: "",
-      /* Mensagens de status */
       authMessage: null,
       authSuccess: false,
+      loading: false
     };
   },
-
   methods: {
-    /**
-     * Tenta fazer login ou registro.
-     * @param {string} type 'login' ou 'register'
-     * @returns {boolean} true se a autenticação foi bem-sucedida, false caso contrário.
-     */
+    /* --- Função Principal chamada pelo botão (CORREÇÃO AQUI) --- */
+    async handleAuth(type) {
+        // 1. Chama a lógica de autenticação
+        const success = await this.authenticate(type);
+        
+        // 2. Se funcionou, redireciona para a lista de tarefas
+        if (success) {
+            this.$router.push({ name: 'TaskList' });
+        }
+    },
+
+    /* --- Lógica de API e Sessão --- */
     async authenticate(type) {
-      this.authMessage = type === "login" ? "Tentando login..." : "Tentando registro...";
-      this.authSuccess = false;
+      this.loading = true;
+      this.authMessage = null;
+      
       const endpoint = type === "login" ? "login" : "register";
       
       try {
@@ -34,33 +53,23 @@ export default {
 
         const { token, role, message } = response.data;
 
-        // --- CORREÇÃO 1: Salvar o nome digitado na memória do navegador ---
         sessionStorage.setItem("token", token);
         sessionStorage.setItem("userRole", role);
-        sessionStorage.setItem("username", this.username); // Salva o nome do usuário
+        sessionStorage.setItem("username", this.username);
         
-        // --- CORREÇÃO 2: Enviar o nome explicitamente para o App.vue ---
-        this.$emit('update-auth', { 
-            token: token, 
-            role: role, 
-            username: this.username 
-        });
+        this.$emit('update-auth', { token, role, username: this.username });
 
         this.authSuccess = true;
-        this.authMessage = message || `Sucesso! Bem-vindo(a) ${this.username}.`;
-        
-        // Não limpamos o this.username aqui para ele não sumir antes do redirecionamento
+        this.authMessage = message || `Bem-vindo(a) ${this.username}.`;
         this.password = ""; 
-        return true; 
+        return true;
       } catch (error) {
         this.authSuccess = false;
-        
-        /* Obtém a mensagem de erro do backend ou uma mensagem padrão */
-        const errorMessage = error.response?.data?.error?.message || 'Erro de conexão ou credenciais inválidas.';
-
-        this.authMessage = `Falha no ${type}: ${errorMessage}`;
-        console.error(`Falha ao ${type}:`, error);
-        return false; 
+        const errorMessage = error.response?.data?.error?.message || 'Erro de conexão.';
+        this.authMessage = errorMessage;
+        return false;
+      } finally {
+        this.loading = false;
       }
     }
   }

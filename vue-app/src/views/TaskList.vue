@@ -3,19 +3,37 @@
     
     <div class="dashboard-toolbar">
       <div class="search-add-group">
-        <div class="input-wrapper">
-            <input type="text" v-model="newTaskTitle" placeholder="Adicionar nova tarefa..." @keyup.enter="createTask" />
-            <button class="btn-add" @click="createTask" :disabled="!newTaskTitle.trim()">+</button>
+        <div class="p-inputgroup">
+            <pv-input 
+                v-model="newTaskTitle" 
+                placeholder="Adicionar nova tarefa..." 
+                @keyup.enter="createTask" 
+            />
+            <pv-button 
+                icon="pi pi-plus" 
+                @click="createTask" 
+                :disabled="!newTaskTitle.trim()" 
+            />
         </div>
       </div>
 
       <div class="filter-group">
-        <select v-model="filterStatus" @change="handleFilterChange">
-            <option value="all">Todas as Tarefas</option>
-            <option value="open">Em Aberto</option>
-            <option value="completed">Concluídas</option>
-        </select>
-        <button @click="loadTasks" class="btn-refresh" title="Atualizar">↻</button>
+        <pv-dropdown 
+            v-model="filterStatus" 
+            :options="statusOptions" 
+            optionLabel="label" 
+            optionValue="value"
+            placeholder="Filtrar Status"
+            @change="handleFilterChange"
+            class="status-dropdown"
+        />
+        
+        <pv-button 
+            icon="pi pi-refresh" 
+            class="p-button-outlined p-button-secondary" 
+            @click="loadTasks" 
+            v-tooltip="'Atualizar Lista'"
+        />
       </div>
     </div>
 
@@ -23,8 +41,10 @@
 
     <div class="task-container">
         <div v-if="tasks.length === 0" class="empty-state">
-            Nenhuma tarefa encontrada.
+            <i class="pi pi-folder-open" style="font-size: 2rem; margin-bottom: 10px;"></i>
+            <p>Nenhuma tarefa encontrada.</p>
         </div>
+        
         <ul class="task-list-grid">
             <TaskItem 
                 v-for="task in tasks" 
@@ -42,5 +62,4 @@
 </template>
 
 <script src="./TaskList.js"></script>
-
 <style lang="scss" src="./TaskList.scss" scoped></style>

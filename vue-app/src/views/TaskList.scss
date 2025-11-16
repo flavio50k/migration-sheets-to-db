@@ -7,96 +7,53 @@
     margin-bottom: 25px;
     gap: 20px;
     flex-wrap: wrap;
+    background: var(--bg-card);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
 }
 
 .search-add-group {
     flex-grow: 1;
     max-width: 500px;
-
-    .input-wrapper {
-        display: flex;
-        background: var(--bg-card);
-        padding: 5px;
-        border-radius: 8px;
-        box-shadow: var(--shadow-sm);
-        border: 1px solid var(--border-color);
-
-        input {
-            flex-grow: 1;
-            border: none;
-            padding: 10px 15px;
-            outline: none;
-            font-size: 0.95rem;
-            background: transparent;
-        }
-
-        .btn-add {
-            background-color: var(--primary);
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 6px;
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            
-            &:hover { background-color: var(--primary-hover); }
-            &:disabled { background-color: #ccc; cursor: not-allowed; }
-        }
-    }
 }
 
 .filter-group {
     display: flex;
     gap: 10px;
+    align-items: center;
+}
 
-    select {
-        padding: 10px 15px;
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        background-color: var(--bg-card);
-        color: var(--text-main);
-        cursor: pointer;
-        font-size: 0.9rem;
-        box-shadow: var(--shadow-sm);
-        
-        &:focus { border-color: var(--primary); outline: none; }
-    }
-
-    .btn-refresh {
-        background: var(--bg-card);
-        border: 1px solid var(--border-color);
-        color: var(--text-muted);
-        padding: 0 15px;
-        font-size: 1.2rem;
-        
-        &:hover { color: var(--primary); border-color: var(--primary); }
-    }
+.status-dropdown {
+    width: 200px;
 }
 
 .task-list-grid {
     list-style: none;
     padding: 0;
     display: grid;
-    gap: 12px; /* Espaço entre os itens */
+    gap: 12px;
 }
 
 .empty-state {
     text-align: center;
-    padding: 40px;
+    padding: 60px;
     color: var(--text-muted);
-    background: #f9fafb;
+    background: var(--bg-card);
     border-radius: 12px;
     border: 2px dashed var(--border-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .error-banner {
     background-color: #fee2e2;
     color: #991b1b;
-    padding: 10px;
+    padding: 15px;
     border-radius: 8px;
     margin-bottom: 20px;
     text-align: center;
-    font-size: 0.9rem;
+    border: 1px solid #fca5a5;
 }
