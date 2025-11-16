@@ -5,17 +5,31 @@ const taskModel = require('../models/TaskModel');
 // --- GET ALL (Lógica de Role e Filtro de Status) ---
 const getAll = async (req, res) => {
     const { id: userId, role } = req.user;
-    const { status } = req.query; 
+    const { status } = req.query;
 
     let tasks;
 
     if (role === 'admin') {
         tasks = await taskModel.getAll(null, status);
     } else {
-        tasks = await taskModel.getAll(userId, status); 
+        tasks = await taskModel.getAll(userId, status);
     }
 
     return res.status(200).json(tasks);
+};
+
+// --- GET BY ID (Buscar uma tarefa específica) ---
+const getById = async (req, res) => {
+    const { id } = req.params;
+    const { id: userId } = req.user;
+
+    const [task] = await taskModel.findById(id, userId);
+
+    if (!task) {
+        return res.status(404).json({ error: { message: 'Tarefa não encontrada.' } });
+    }
+
+    return res.status(200).json(task);
 };
 
 // --- CREATE TASK ---
@@ -57,13 +71,13 @@ const exclude = async (req, res) => {
     const { role } = req.user;
 
     if (role !== 'admin') {
-        return res.status(403).json({ 
-            error: { message: 'Acesso negado: Apenas administradores podem excluir tarefas.' } 
+        return res.status(403).json({
+            error: { message: 'Acesso negado: Apenas administradores podem excluir tarefas.' }
         });
     }
-    
+
     const deleted = await taskModel.excludeAny(id);
-    
+
     if (deleted) {
         return res.status(204).send();
     } else if (role !== 'admin') {
@@ -75,6 +89,7 @@ const exclude = async (req, res) => {
 
 module.exports = {
     getAll,
+    getById,
     create,
     update,
     exclude,

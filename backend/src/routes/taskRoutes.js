@@ -15,14 +15,21 @@ router.use(authMiddleware);
 // READ - GET /tasks
 router.get('/', taskController.getAll); 
 
+// READ ONE - GET /tasks/:id
+router.get('/:id', taskController.getById);
+
 // CREATE - POST /tasks
 router.post('/', validateBody, taskController.create); 
 
 // DELETE - DELETE /tasks/:id
 router.delete('/:id', taskController.exclude);
 
-// UPDATE - PUT /tasks/:id
+// UPDATE - PUT /tasks/:id/complete & /tasks/:id
+// 1º: Rota Específica (Completar Tarefa)
 router.put('/:id/complete', taskController.update);
+
+// 2º: Rota Genérica (Editar Título/Outros dados)
+router.put('/:id', validateBody, taskController.update);
 
 // 4. Exporta o roteador para ser usado no server.js
 module.exports = router;

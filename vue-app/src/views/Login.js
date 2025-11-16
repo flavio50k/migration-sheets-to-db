@@ -3,6 +3,7 @@ import axios from "axios";
 const API_URL = "/api";
 
 export default {
+  name: "LoginLogic",
   data() {
     return {
       /* Dados do formulário de login/registro */
@@ -33,17 +34,24 @@ export default {
 
         const { token, role, message } = response.data;
 
-        /* Armazenar o token e role no sessionStorage (MANTER CONSISTÊNCIA) */
+        // --- CORREÇÃO 1: Salvar o nome digitado na memória do navegador ---
         sessionStorage.setItem("token", token);
         sessionStorage.setItem("userRole", role);
+        sessionStorage.setItem("username", this.username); // Salva o nome do usuário
         
-        /* Notifica o App.vue para atualizar o estado global (via mixin do App.js) */
-        this.$emit('update-auth', { token, role });
+        // --- CORREÇÃO 2: Enviar o nome explicitamente para o App.vue ---
+        this.$emit('update-auth', { 
+            token: token, 
+            role: role, 
+            username: this.username 
+        });
 
         this.authSuccess = true;
         this.authMessage = message || `Sucesso! Bem-vindo(a) ${this.username}.`;
-        this.password = "";
-        return true; /* Sucesso para a View gerenciar a navegação */
+        
+        // Não limpamos o this.username aqui para ele não sumir antes do redirecionamento
+        this.password = ""; 
+        return true; 
       } catch (error) {
         this.authSuccess = false;
         
@@ -52,8 +60,8 @@ export default {
 
         this.authMessage = `Falha no ${type}: ${errorMessage}`;
         console.error(`Falha ao ${type}:`, error);
-        return false; /* Retorna falha para a View gerenciar */
+        return false; 
       }
-    },
-  },
+    }
+  }
 };
