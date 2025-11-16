@@ -1,26 +1,34 @@
 <template>
-    <div class="auth-section">
-        <h2>Acesso ao Sistema</h2>
-        <input type="text" v-model="username" placeholder="Usuário" required />
-        <input type="password" v-model="password" placeholder="Senha" required />
+    <div class="login-container">
+        <div class="auth-card">
+            <h2>Acesso ao Sistema</h2>
+            <p class="subtitle">Gerenciamento de Migrações</p>
+            
+            <div class="form-group">
+                <input type="text" v-model="username" placeholder="Usuário" required />
+            </div>
+            <div class="form-group">
+                <input type="password" v-model="password" placeholder="Senha" required />
+            </div>
 
-        <button @click="handleAuth('login')">Entrar</button>
-        <button @click="handleAuth('register')">Registrar</button>
+            <div class="actions">
+                <button class="btn-primary" @click="handleAuth('login')">Entrar</button>
+                <button class="btn-secondary" @click="handleAuth('register')">Criar Conta</button>
+            </div>
 
-        <p v-if="authMessage" :style="{ color: authSuccess ? 'green' : 'red' }">
-            {{ authMessage }}
-        </p>
+            <p v-if="authMessage" class="message" :class="{ 'success': authSuccess, 'error': !authSuccess }">
+                {{ authMessage }}
+            </p>
+        </div>
     </div>
 </template>
 
 <script>
 import LoginLogic from './Login.js';
-
 export default {
     name: "LoginView",
     mixins: [LoginLogic],
     methods: {
-        // Redireciona o usuário para a lista de tarefas após o login
         async handleAuth(type) {
             const success = await this.authenticate(type);
             if (success) {
@@ -31,5 +39,4 @@ export default {
 };
 </script>
 
-<style scoped>
-</style>
+<style lang="scss" src="./Login.scss" scoped></style>

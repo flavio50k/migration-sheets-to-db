@@ -1,142 +1,79 @@
-/* O App.scss permanece inalterado  */
 /* vue-app/src/App.scss */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+:root {
+  --bg-body: #f3f4f6;
+  /* Cinza fundo */
+  --bg-card: #ffffff;
+  /* Branco card */
+  --primary: #4f46e5;
+  /* Indigo/Azul moderno */
+  --primary-hover: #4338ca;
+  --text-main: #111827;
+  /* Quase preto */
+  --text-muted: #6b7280;
+  /* Cinza texto */
+  --border-color: #e5e7eb;
+  /* Borda suave */
+  --danger: #ef4444;
+  --success: #10b981;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-body);
+  color: var(--text-main);
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  background-color: #ffffff;
+  max-width: 1000px;
+  /* Largura maior para parecer dashboard */
+  margin: 40px auto;
+  padding: 0 20px;
 }
 
-h1 {
-  color: #007bff;
-  text-align: center;
-}
-
-hr {
-  margin: 20px 0;
-  border: 0;
-  border-top: 1px solid #eee;
-}
-
-/* Estilos de Botões */
-button {
-  padding: 8px 15px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-
-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
-
-/* Seção de Autenticação */
-.auth-section {
-  padding: 15px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background-color: #f7f7f7;
-}
-
-.auth-section input {
-  display: block;
-  width: 90%;
-  padding: 10px;
-  margin: 10px auto;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.auth-section button {
-  padding: 10px 15px;
-  margin-right: 10px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.auth-section button:hover {
-  background-color: #0056b3;
-}
-
-/* Seção Principal */
-.app-section {
-  padding: 10px;
-}
-
+/* Header Global (Barra superior) */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
+  background: var(--bg-card);
+  padding: 15px 25px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+
+  h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-main);
+  }
+
+  button {
+    background-color: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+    padding: 8px 16px;
+    font-weight: 500;
+
+    &:hover {
+      background-color: #f9fafb;
+      color: var(--danger);
+      border-color: var(--danger);
+    }
+  }
 }
 
-.header button {
-  padding: 8px 15px;
-  background-color: #6c757d;
-  color: white;
+/* Reset de botões globais para estilo moderno */
+button {
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
-}
-
-/* Área de Nova Tarefa */
-.new-task-area {
-  display: flex;
-  margin: 20px 0;
-}
-
-.new-task-area input {
-  flex-grow: 1;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px 0 0 4px;
-}
-
-.new-task-area button {
-  border-radius: 0 4px 4px 0;
-}
-
-/* Lista de Tarefas */
-.task-list {
-  list-style: none;
-  padding: 0;
-}
-
-/* Mensagens */
-.error-msg {
-  color: red;
-  font-weight: bold;
-  margin-top: 10px;
-}
-
-/* Estilos do Componente de Migração (para complementar a funcionalidade Admin) */
-.migration-card {
-  border: 1px solid #4a90e2;
-  padding: 15px;
-  border-radius: 4px;
-  margin-top: 20px;
-  background: #eaf3ff;
-}
-.migration-card h3 {
-  margin-top: 0;
-  color: #4a90e2;
-}
-.migration-card button {
-  margin-left: 10px;
+  transition: all 0.2s;
+  font-family: inherit;
 }

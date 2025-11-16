@@ -1,57 +1,154 @@
 /* vue-app/src/components/task/TaskItem.scss */
-.task-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  border: 1px solid #ccc;
-  margin-bottom: 8px;
-  border-radius: 4px;
-  background: #f9f9f9;
-}
-.task-content {
-  display: flex;
-  align-items: center;
-  flex-grow: 1; /* Ocupa o espaço restante  */
-}
-.task-title-text {
-  cursor: pointer; /* Indica que é clicável */
-  flex-grow: 1;
-  margin-left: 10px;
-}
-.completed {
-  text-decoration: line-through;
-  color: #888;
-}
-.admin-tag {
-  margin-left: 10px;
-  padding: 2px 5px;
-  background: #4a90e2;
-  color: white;
-  border-radius: 3px;
-  font-size: 0.7em;
-  font-weight: bold;
-}
-.edit-input {
-  flex-grow: 1;
-  margin-left: 10px;
-  padding: 5px;
-  border: 1px solid #007bff;
-  border-radius: 3px;
+
+.task-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg-card);
+    padding: 16px 20px;
+    border-radius: 10px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+    cursor: pointer;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--primary);
+        
+        .arrow-indicator { opacity: 1; transform: translateX(0); }
+    }
+
+    &.is-completed {
+        opacity: 0.7;
+        background-color: #f9fafb;
+        
+        .task-title {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+    }
 }
 
-.task-actions button {
-  margin-left: 8px;
-  padding: 5px 10px;
-  border: none;
-  border-radius: 3px;
-  cursor: pointer;
+.task-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-grow: 1;
 }
-.save-btn {
-  background-color: #28a745;
-  color: white;
+
+.task-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex-grow: 1;
 }
-.delete-btn {
-  background-color: #dc3545;
-  color: white;
+
+.task-title {
+    font-weight: 500;
+    color: var(--text-main);
+    font-size: 1rem;
+}
+
+.edit-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--primary);
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.task-meta {
+    display: flex;
+    gap: 8px;
+}
+
+.badge {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.id-badge { background-color: #e0e7ff; color: var(--primary); }
+.admin-badge { background-color: #fee2e2; color: var(--danger); }
+
+/* Actions */
+.task-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-icon {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    padding: 6px;
+    border-radius: 4px;
+    font-size: 1.1rem;
+
+    &:hover.edit { color: var(--primary); background: #e0e7ff; }
+    &:hover.save { color: var(--success); background: #d1fae5; }
+    &:hover.delete { color: var(--danger); background: #fee2e2; }
+}
+
+.arrow-indicator {
+    font-size: 1.5rem;
+    color: var(--text-muted);
+    opacity: 0;
+    transform: translateX(-5px);
+    transition: all 0.2s;
+    margin-left: 10px;
+}
+
+/* Checkbox Customizado (Bola ou Quadrado Clean) */
+.custom-checkbox {
+    display: block;
+    position: relative;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    user-select: none;
+
+    input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+        height: 0;
+        width: 0;
+    }
+
+    .checkmark {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 20px;
+        width: 20px;
+        background-color: #eee;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        transition: background-color 0.2s;
+    }
+
+    &:hover input ~ .checkmark { background-color: #ccc; }
+    input:checked ~ .checkmark { background-color: var(--success); border-color: var(--success); }
+
+    /* Icone do check */
+    .checkmark:after {
+        content: "";
+        position: absolute;
+        display: none;
+    }
+    input:checked ~ .checkmark:after { display: block; }
+    .checkmark:after {
+        left: 7px;
+        top: 3px;
+        width: 5px;
+        height: 10px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
 }

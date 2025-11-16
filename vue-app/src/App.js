@@ -1,8 +1,9 @@
-/* vue-app/src/App.js  */
+/* vue-app/src/App.js */
 import axios from "axios";
 const API_URL = "/api";
 
 export default {
+  name: "App", /* Adicionado para identificar o componente */
   data() {
     return {
       apiUrl: API_URL,
@@ -12,7 +13,6 @@ export default {
   },
 
   methods: {
-
     /* Atualiza o estado global com os dados de autenticação. */
     updateAuth({ token, role }) {
       this.token = token;
@@ -40,7 +40,7 @@ export default {
       sessionStorage.clear();
       this.token = null;
       this.userRole = "user";
-      this.$router.push({ path: '/login' });
-    },
+      window.location.href = '/login'; 
+    }
   },
 };

@@ -13,11 +13,6 @@
   </div>
 </template>
 
-<script>
-import AppLogic from './App.js'; 
+<script src="./App.js"></script>
 
-export default {
-  name: "App",
-  mixins: [AppLogic],
-};
-</script>
+<style lang="scss" src="./App.scss"></style>

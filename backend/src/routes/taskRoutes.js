@@ -22,7 +22,7 @@ router.post('/', validateBody, taskController.create);
 router.delete('/:id', taskController.exclude);
 
 // UPDATE - PUT /tasks/:id
-router.put('/:id', validateBody, taskController.update);
+router.put('/:id/complete', taskController.update);
 
 // 4. Exporta o roteador para ser usado no server.js
 module.exports = router;

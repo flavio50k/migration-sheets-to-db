@@ -54,16 +54,16 @@ const update = async (req, res) => {
 // --- DELETE TASK ---
 const exclude = async (req, res) => {
     const { id } = req.params;
-    const { role, id: userId } = req.user;
+    const { role } = req.user;
 
-    let deleted = false;
-
-    if (role === 'admin') {
-        deleted = await taskModel.excludeAny(id);
-    } else {
-        deleted = await taskModel.exclude(id, userId);
+    if (role !== 'admin') {
+        return res.status(403).json({ 
+            error: { message: 'Acesso negado: Apenas administradores podem excluir tarefas.' } 
+        });
     }
-
+    
+    const deleted = await taskModel.excludeAny(id);
+    
     if (deleted) {
         return res.status(204).send();
     } else if (role !== 'admin') {
