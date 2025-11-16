@@ -83,9 +83,17 @@ const update = async (id, userId, title, completed) => {
     }
 
     params.push(id);
-    params.push(userId);
 
-    const query = `UPDATE tasks SET ${setClauses.join(', ')} WHERE id = ? AND user_id = ?`;
+    // LÓGICA NOVA: 
+    // Se userId for passado (usuário comum), adiciona a trava de segurança.
+    // Se userId for null (admin), remove a trava e atualiza só pelo ID da tarefa.
+    let query = `UPDATE tasks SET ${setClauses.join(', ')} WHERE id = ?`;
+    
+    if (userId) {
+        query += ' AND user_id = ?';
+        params.push(userId);
+    }
+
     const [result] = await internalPool.execute(query, params);
 
     return result.affectedRows > 0;

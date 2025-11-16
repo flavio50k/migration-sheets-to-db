@@ -21,9 +21,11 @@ const getAll = async (req, res) => {
 // --- GET BY ID (Buscar uma tarefa específica) ---
 const getById = async (req, res) => {
     const { id } = req.params;
-    const { id: userId } = req.user;
+    const { id: userId, role } = req.user;
 
-    const [task] = await taskModel.findById(id, userId);
+    const filterUser = role === 'admin' ? null : userId;
+
+    const [task] = await taskModel.findById(id, filterUser);
 
     if (!task) {
         return res.status(404).json({ error: { message: 'Tarefa não encontrada.' } });
@@ -52,14 +54,16 @@ const create = async (req, res) => {
 // --- UPDATE TASK ---
 const update = async (req, res) => {
     const { id } = req.params;
-    const { id: userId } = req.user;
+    const { id: userId, role } = req.user;
     const { title, completed } = req.body;
 
-    const updated = await taskModel.update(id, userId, title, completed);
+    const filterUser = role === 'admin' ? null : userId;
+
+    const updated = await taskModel.update(id, filterUser, title, completed);
 
     if (updated) {
-        const [updatedTaks] = await taskModel.findById(id, userId);
-        return res.status(200).json(updatedTaks);
+        const [updatedTask] = await taskModel.findById(id, filterUser);
+        return res.status(200).json(updatedTask);
     } else {
         return res.status(404).json({ error: { message: 'Tarefa não encontrada ou não pertence ao usuário.' } });
     }
