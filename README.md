@@ -1,38 +1,46 @@
-# 🚀 Projeto Fullstack com Docker Compose 
-## Node.js + Vue.js + MySQL + phpMyAdmin
+# 🚀 Projeto Fullstack de Migração de Dados com Docker Compose
+## Node.js + Vue.js + MySQL + PrimeVue
 
-Um **projeto Fullstack completo e orquestrado com Docker Compose**, unindo **Node.js (Express)** no backend, **Vue.js 3 (com Nginx)** no frontend e **MySQL 8.0** como banco de dados, acompanhado do **phpMyAdmin** para administração.  
-Totalmente containerizado, modular e pronto para desenvolvimento ou implantação em produção.  
+Este projeto Fullstack é um sistema de gestão de tarefas focado na **Migração de Dados** de planilhas (`.xlsx`, `.csv`) para um banco de dados de destino (`consultorio_teste`).
+
+A solução é totalmente containerizada com **Docker Compose**, unindo **Node.js (Express)** no backend, **Vue.js 3** com o framework **PrimeVue** para uma interface moderna, e **MySQL 8.0** para persistência e armazenamento dos dados de migração.
+
+---
+
+## 🎯 Funcionalidades e Regras de Negócio
+
+1.  **Controle de Acesso:** Usuários e Administradores (Admin).
+2.  **Gestão de Tarefas:** Usuários podem criar e completar suas próprias tarefas.
+3.  **Permissões de Admin:**
+    * **Exclusão:** Apenas Administradores podem excluir qualquer tarefa.
+    * **Visualização/Edição:** Administradores podem visualizar detalhes e atualizar **todas** as tarefas do sistema (Regra implementada no `taskController`).
+4.  **Fluxo de Migração:** Cada tarefa permite o **Upload de uma Planilha**, registrando o arquivo e metadados no DB para posterior processamento e inserção no banco de destino.
 
 ---
 
 ## 🧱 Arquitetura de Contêineres
 
-| Serviço | Tecnologia | Descrição |
-|----------|-------------|------------|
-| **backend** | Node.js + Express | API REST responsável pela autenticação, regras de negócio e persistência de dados. |
-| **vue-app** | Vue.js 3 + Nginx | Interface do usuário moderna e responsiva. |
-| **db** | MySQL 8.0 | Banco de dados relacional. |
-| **phpmyadmin** | phpMyAdmin | Ferramenta web para gerenciamento e consultas SQL. |
-
-Todos os serviços são orquestrados pelo **Docker Compose**, garantindo isolamento, escalabilidade e portabilidade entre ambientes.
+| Serviço | Tecnologia | Porta Host | Descrição |
+| :--- | :--- | :--- | :--- |
+| **backend** | Node.js + Express | `3000` | API REST, Autenticação, Regras de Negócio e Lógica de Upload. |
+| **frontend** | Vue.js 3 + Nginx | `8080` | Interface do usuário moderna, construída com PrimeVue. |
+| **db** | MySQL 8.0 | `3306` | Banco de dados principal (`projeto_db`) e de destino (`consultorio_teste`). |
+| **phpmyadmin** | phpMyAdmin | `8081` | Ferramenta web para gerenciamento visual do MySQL. |
 
 ---
 
 ## ⚙️ Tecnologias Utilizadas
 
-### 🖥️ Backend
-- **Node.js + Express**
-- **JWT (JSON Web Token)** para autenticação segura
-- **RBAC (Role-Based Access Control)** para controle de permissões
-- **Joi** para validação de dados
-- **MySQL 8.0** com integração via ORM
-- **Nodemon** para desenvolvimento com recarga automática
+### 🖥️ Frontend (Vue.js 3)
+* **PrimeVue:** Biblioteca de componentes UI para layout profissional e moderno.
+* **Axios:** Cliente HTTP para comunicação com a API.
+* **Vue Router:** Gerenciamento de rotas e Guardas de Autenticação.
 
-### 🌐 Frontend
-- **Vue.js 3** com composição moderna e componentes reutilizáveis
-- **Nginx** como servidor estático e proxy reverso
-- Integração total com a API REST do backend
+### 💻 Backend (Node.js + Express)
+* **JWT:** Autenticação segura.
+* **RBAC:** Controle de permissões (user/admin).
+* **Multer:** Middleware para tratamento de upload de arquivos.
+* **MySQL2/Promise:** Conexão otimizada para o banco de dados.
 
 ### 🗄️ Banco de Dados
 - **MySQL 8.0** — persistência de dados confiável
@@ -40,99 +48,36 @@ Todos os serviços são orquestrados pelo **Docker Compose**, garantindo isolame
 
 ---
 
-## 🔒 Segurança e Regras de Negócio
+## 🧠 Rotas da API (API REST Endpoints)
 
-O backend implementa um **sistema robusto de autenticação e autorização**, baseado em **JWT** e **RBAC**, garantindo acesso seguro e segmentado às funcionalidades da aplicação.
-
-### Perfis de Usuário
-
-| Perfil | Permissões |
-|---------|-------------|
-| 🧍 **Usuário Comum (`user`)** | Pode **visualizar, criar e editar/concluir** apenas **suas próprias tarefas**. |
-| 👑 **Administrador (`admin`)** | Pode **visualizar todas as tarefas** e **excluir tarefas de qualquer usuário**. |
-
-- Tokens JWT com expiração configurável  
-- Middleware de autenticação e autorização em todas as rotas protegidas  
-- Hash seguro de senhas (bcrypt)  
-- Boas práticas de CORS, tratamento de erros e variáveis de ambiente  
+| Método | Rota | Descrição | Permissão |
+| :--- | :--- | :--- | :--- |
+| **POST** | `/users/register` | Cria um novo usuário (`role: user`). | Pública |
+| **POST** | `/users/login` | Login, retorna JWT (`token`). | Pública |
+| **GET** | `/tasks` | Lista tarefas (todas para Admin, próprias para User). | user/admin |
+| **GET** | `/tasks/:id` | **Detalhe da Tarefa** (necessário para o Upload). | user/admin |
+| **POST** | `/tasks` | Cria uma nova tarefa. | user/admin |
+| **PUT** | `/tasks/:id` | Atualiza título/dados. | Admin (Qualquer) / User (Própria) |
+| **PUT** | `/tasks/:id/complete` | **Marca/Desmarca** tarefa como concluída. | Admin (Qualquer) / User (Própria) |
+| **DELETE** | `/tasks/:id` | Exclui tarefa. | **Admin (Único)** |
+| **POST** | `/migrations/:taskId/upload` | Recebe a planilha (`multipart/form-data`) e cria o registro de migração. | user/admin |
 
 ---
 
-## 🧩 Estrutura de Pastas
+## 🛠️ Instalação e Execução (Docker)
 
+Certifique-se de que o Docker e o Docker Compose estejam instalados.
+
+1.  **Variáveis de Ambiente:** Crie o arquivo `.env` na raiz do projeto com base no `.env.example`.
+2.  **Build & Run:** O comando abaixo irá construir todas as imagens (incluindo a instalação do **PrimeVue**) e inicializar os serviços.
+
+### 🐳 Construa e inicie os containers
 ```bash
-PROJETO_FULLSTACK_MIGRAÇÃO (WSL)
-├── backend/
-│   ├── node_modules/
-│   ├── src/
-│   │   ├── config/
-│   │   │   ├── database.js
-│   │   │   └── env.js
-│   │   ├── controllers/
-│   │   │   ├── migrationController.js
-│   │   │   ├── taskController.js
-│   │   │   └── userController.js
-│   │   ├── middlewares/
-│   │   │   ├── adminMiddleware.js
-│   │   │   ├── authMiddleware.js
-│   │   │   ├── errorMiddleware.js
-│   │   │   ├── taskValidation.js
-│   │   │   └── uploadMiddleware.js
-│   │   ├── models/
-│   │   │   ├── MigrationModel.js
-│   │   │   ├── TaskModel.js
-│   │   │   └── UserModel.js
-│   │   ├── routes/
-│   │   │   ├── migrationRoutes.js
-│   │   │   ├── taskRoutes.js
-│   │   │   └── userRoutes.js
-│   ├── uploads/
-│   ├── Dockerfile
-│   ├── nodemon.json
-│   ├── package-lock.json
-│   ├── package.json
-│   └── server.js
-│
-├── db-init/
-│   └── 01-create-external-db.sql
-│
-├── vue-app/
-│   ├── public/
-│   │   ├── favicon.ico
-│   │   └── index.html
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── migration/
-│   │   │   │   ├── MigrationUpload.js
-│   │   │   │   ├── MigrationUpload.scss
-│   │   │   │   └── MigrationUpload.vue
-│   │   │   └── task/
-│   │   │       ├── TaskItem.js
-│   │   │       ├── TaskItem.scss
-│   │   │       └── TaskItem.vue
-│   │   ├── mixins/
-│   │   │   └── TaskLogic.js
-│   │   ├── router/
-│   │   │   └── index.js
-│   │   ├── views/
-│   │   │   ├── TaskDetail.vue
-│   │   │   └── TaskList.vue
-│   │   ├── App.js
-│   │   ├── App.scss
-│   │   ├── App.vue
-│   │   └── main.js
-│   ├── Dockerfile
-│   ├── nginx.conf
-│   └── package.json
-│
-├── .env
-├── .env.example
-├── .gitattributes
-├── .gitignore
-├── docker-compose.yml
-└── README.md
-
+# Inicializa todos os containers (Backend, Frontend, DB, PhpMyAdmin)
+docker-compose up --build -d
 ```
+
+---
 
 ## 🐳 Como Executar o Projeto
 
@@ -160,9 +105,7 @@ JWT_EXPIRES_IN=1d
 docker-compose up -d --build
 ```
 
----
-
-## 4️⃣ Acesse os serviços
+### 4️⃣ Acesse os serviços
 
 | Serviço | URL |
 |---------|-----|
@@ -170,45 +113,6 @@ docker-compose up -d --build
 | ⚙️ **Backend (API Express)** | http://localhost:3000 |
 | 🗄️ **phpMyAdmin** | http://localhost:8081 |
 | 🛢️ **MySQL** | http://localhost:3306 |
-
-Todos os serviços são orquestrados pelo **Docker Compose**, garantindo isolamento, escalabilidade e portabilidade entre ambientes.
-
----
-
-
-## 🧠 Exemplos de Rotas da API
-
-| Método | Rota | Descrição | Permissão |
-|--------|------|-----------|-----------|
-| POST   | /auth/login   | Login de usuário               | Pública        |
-| POST   | /tasks        | Cria uma nova tarefa           | user/admin     |
-| GET    | /tasks        | Lista tarefas (todas ou próprias) | user/admin |
-| PUT    | /tasks/:id    | Atualiza uma tarefa própria   | user/admin     |
-| DELETE | /tasks/:id    | Exclui tarefa (somente admin) | admin          |
-
----
-
-## 🧰 Comandos Úteis
-
-```bash
-# Parar containers
-docker-compose down
-
-# Remover containers, volumes e imagens
-docker-compose down --volumes --rmi all
-
-# Ver logs em tempo real
-docker-compose logs -f
-```
-
-## 🏁 Conclusão
-
-Este projeto foi desenvolvido com foco em **segurança, modularidade e escalabilidade**.  
-Com **Docker Compose**, toda a stack — backend, frontend, banco e phpMyAdmin —  
-é inicializada com um único comando.
-
-> 💡 Ideal para quem busca uma base sólida para aplicações web seguras, com autenticação,  
->     autorização e gerenciamento de tarefas multiusuário.
 
 ---
 
