@@ -1,0 +1,95 @@
+MIGRATION-SHEETS-TO-DB/
+├── backend/
+│   ├── node_modules/
+│   ├── src/
+│   │   ├── config/
+│   │   │   ├── database.js
+│   │   │   └── env.js
+│   │   ├── controllers/
+│   │   │   ├── migrationController.js
+│   │   │   ├── taskController.js
+│   │   │   └── userController.js
+│   │   ├── middlewares/
+│   │   │   ├── adminMiddleware.js
+│   │   │   ├── authMiddleware.js
+│   │   │   ├── errorMiddleware.js
+│   │   │   ├── taskValidation.js
+│   │   │   └── uploadMiddleware.js
+│   │   ├── models/
+│   │   │   ├── MigrationModel.js
+│   │   │   ├── TaskModel.js
+│   │   │   └── UserModel.js
+│   │   ├── routes/
+│   │   │   ├── migrationRoutes.js
+│   │   │   ├── taskRoutes.js
+│   │   │   └── userRoutes.js
+│   ├── uploads/
+│   ├── Dockerfile
+│   ├── nodemon.json
+│   ├── package-lock.json
+│   ├── package.json
+│   └── server.js
+│
+├── db-init/
+│   └── 01-create-external-db.sql
+│
+├── vue-app/
+│   ├── public/
+│   │   ├── favicon.ico
+│   │   └── index.html
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── migration/
+│   │   │   │   ├── MigrationUpload.js
+│   │   │   │   ├── MigrationUpload.scss
+│   │   │   │   └── MigrationUpload.vue
+│   │   │   └── task/
+│   │   │       ├── TaskItem.js
+│   │   │       ├── TaskItem.scss
+│   │   │       └── TaskItem.vue
+│   │   ├── mixins/
+│   │   │   └── TaskLogic.js
+│   │   ├── router/
+│   │   │   └── index.js
+│   │   ├── views/
+│   │   │   ├── TaskDetail.vue
+│   │   │   └── TaskList.vue
+│   │   ├── App.js
+│   │   ├── App.scss
+│   │   ├── App.vue
+│   │   └── main.js
+│   ├── Dockerfile
+│   ├── nginx.conf
+│   └── package.json
+│
+├── .env
+├── .env.example
+├── .gitattributes
+├── .gitignore
+├── docker-compose.yml
+└── README.md
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
